@@ -56,7 +56,7 @@ export default function StartingScreen(props) {
             </TouchableNativeFeedback>
           </View>
         </ScrollView>
-        <SignupModal modalStatus={modalDisplay} />
+        <SignupModal modalStatus={modalDisplay} onClick={modalHandler}/>
       </SafeAreaView>
     </>
   );
