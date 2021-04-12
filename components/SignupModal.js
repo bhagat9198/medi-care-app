@@ -29,30 +29,35 @@ export default function SignupModal(props) {
   const [cPassword, setCPassword] = useState('');
   const [gender, setGender] = useState('');
   const [phone, setPhone] = useState('');
+  const [userType, setUserType] = useState('');
 
-  const pickerHandler = (val) => {
-    console.log(val);
+  const genderHandler = (val) => {
     setGender(val);
+  };
+
+  const userTypeHandler = (val) => {
+    setUserType(val);
   };
 
   const appUserState = useSelector(state => state.authReducer);
   const dispatch = useDispatch();
 
   const registerUser = () => {
-    console.log(fName, lName, email, password, cPassword, gender, phone, age);
-    // if(password !== cPassword) {
-    //   return Alert.alert('Opps!!!', 'Password\'s didnt match' );
-    // }
-    // if(password.length < 6) {
-    //   return Alert.alert('Password Length', 'Password length should be minium 6 characters' );
-    // }
-    // if(fName.isEmpty() || lName.isEmpty() || email.isEmpty() || gender.isEmpty() || isNaN(age) || isNaN(phone)) {
-    //   return Alert.alert('Empty Field', 'None of the field\'s should be empty' );
-    // }
+    console.log(fName, lName, email, password, cPassword, gender, phone, age, userType);
+    if(password !== cPassword) {
+      return Alert.alert('Opps!!!', 'Password\'s didnt match' );
+    }
+    if(password.length < 6) {
+      return Alert.alert('Password Length', 'Password length should be minium 6 characters' );
+    }
 
-    // if(!fName || !lName || !email || !gender || isNaN(age) || isNaN(phone)) {
-    //   return Alert.alert('Empty Field', 'None of the field\'s should be empty' );
-    // }
+    if(!fName || !lName || !email || !gender || !userType || isNaN(age) || isNaN(phone)) {
+      return Alert.alert('Empty Field', 'None of the field\'s should be empty' );
+    }
+
+    if(userType === "You are" || gender === "Select Gender") {
+      return Alert.alert('Inappropriate Value', 'Please select valid value from dropdown.' );
+    }
 
     let signupData = {
       fName,
@@ -61,7 +66,8 @@ export default function SignupModal(props) {
       password,
       gender,
       phone,
-      age
+      age,
+      userType
     }
     Keyboard.dismiss();
     dispatch(signupAction(signupData))
@@ -105,7 +111,7 @@ export default function SignupModal(props) {
             />
             <Picker
               selectedValue={gender}
-              onValueChange={val => pickerHandler(val)}
+              onValueChange={val => genderHandler(val)}
               mode={Platform.OS === "android" ? "dropdown" : "dialog"}
               style={styles.picker}
               dropdownIconColor="gray"
@@ -120,6 +126,24 @@ export default function SignupModal(props) {
                 value="male"
               />
               <Picker.Item label="Female" value="female" />
+            </Picker>
+            <Picker
+              selectedValue={userType}
+              onValueChange={val => userTypeHandler(val)}
+              mode={Platform.OS === "android" ? "dropdown" : "dialog"}
+              style={styles.picker}
+              dropdownIconColor="gray"
+            >
+              <Picker.Item
+                label="You are"
+                value="You are"
+                enabled={false}
+              />
+              <Picker.Item
+                label="Patient"
+                value="patients"
+              />
+              <Picker.Item label="Doctor" value="doctors" />
             </Picker>
             <TextInput
               style={styles.inputBox}

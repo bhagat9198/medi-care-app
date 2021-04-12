@@ -1,12 +1,16 @@
+import { LogBox } from 'react-native';
+LogBox.ignoreLogs(['Setting a timer']);
 
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import StartingScreen from "./screens/StartingScreen";
 
-import { createStore, combineReducers, applyMiddleware } from "redux";
-import authReducer from "./store/reducers/auth";
-import { Provider } from "react-redux";
+import React, {useState} from "react";
 import thunk from 'redux-thunk';
+
+import { Provider } from "react-redux";
+import { StyleSheet, Text, View } from "react-native";
+import { createStore, combineReducers, applyMiddleware } from "redux";
+
+import StartingScreen from "./screens/StartingScreen";
+import authReducer from "./store/reducers/auth";
  
 const rootReducer = combineReducers({
   authReducer: authReducer,
@@ -14,6 +18,7 @@ const rootReducer = combineReducers({
 const store = createStore(rootReducer, applyMiddleware(thunk));
 
 export default function App() {
+  
 
   return (
     <Provider store={store}>
