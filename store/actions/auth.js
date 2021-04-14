@@ -5,19 +5,21 @@ export const AUTHENTICATION = "AUTHENTICATION";
 export const LOGOUT = "LOGOUT";
 
 export const loginAction = (email, password, userType) => {
-  console.log(email, password, userType, 'lol');
   return (dispatch, getState) => {
     auth
       .signInWithEmailAndPassword(email, password)
       .then((user) => {
-        console.log('[][][]', user);
+        let storeData = {
+          userType: userType,
+        };
+        storeUserInfoInApp(storeData);
+
         return db
           .collection(userType)
           .doc(user.user.uid).get();
 
       }).then(doc => {
         let docData = doc.data();
-        console.log('docData', docData);
         dispatch({
           type: AUTHENTICATION,
           data: {
@@ -111,7 +113,7 @@ export const autoLogin = () => {
         let extractedData = await AsyncStorage.getItem("@userType");
         let userData = await JSON.parse(extractedData);
         let collectionName = "patients";
-        if (userData.userType === "doctor") {
+        if (userData.userType === "doctors") {
           collectionName = "doctors";
         }
 

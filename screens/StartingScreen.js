@@ -17,11 +17,11 @@ export default function StartingScreen(props) {
 
   const dispatch = useDispatch();
 
-  if (!appLoad) {
-    return <View>
-      <Text>Loading</Text>
-    </View>;
-  }
+  // if (!appLoad) {
+  //   return <View>
+  //     <Text>Loading</Text>
+  //   </View>;
+  // }
 
   const findUserState = () => {
     console.log("appUserState======================", appUserState);
@@ -63,5 +63,5 @@ export default function StartingScreen(props) {
   
   
 
-  return <>{ComponentToRender}</>;
+  return <>{!appLoad ? <View><Text>Loshuiguyd</Text></View>: ComponentToRender}</>;
 }
