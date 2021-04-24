@@ -17,7 +17,6 @@ export default function StartingScreen(props) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log('appUserState======================', appUserState);
     if (appUserState.userId) {
       if (appUserState.userType === 'doctors') {
         setDoctorComp(true);
@@ -46,7 +45,6 @@ export default function StartingScreen(props) {
   if (!doctorComp && patientComp) {
     ComponentToRender = <PatientNavigation />;
   }
-  console.log(doctorComp, patientComp);
 
   return (
     <>

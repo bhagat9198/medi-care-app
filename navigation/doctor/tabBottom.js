@@ -5,6 +5,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Fontisto from 'react-native-vector-icons/Fontisto';
+
 import {View} from 'react-native';
 
 import {
@@ -14,7 +16,10 @@ import {
   ConsultsStackScreen,
   OnlineConsultsStackScreen,
   OfflineConsultsStackScreen,
+  DoctorsStackScreen,
+  UploadDoctorStackScreen,
 } from './stack';
+
 import {TabDoctor} from './../../constants/Navigation';
 import {appColor} from './../../constants/App';
 
@@ -173,4 +178,65 @@ export const ConsultsTabScreen = () => {
       />
     </ConsultsTab.Navigator>
   );
+};
+
+const DoctorsTab = createBottomTabNavigator();
+
+export const DoctorsTabScreen = () => {
+  return(<DoctorsTab.Navigator
+    tabBarOptions={{
+      activeBackgroundColor: appColor.dark.primary,
+      inactiveBackgroundColor: appColor.dark.secondary,
+      activeTintColor: 'red',
+      inactiveTintColor: appColor.dark.text_primary,
+      activeTintColor: appColor.dark.text_secondary,
+      showLabel: false,
+    }}>
+    <DoctorsTab.Screen
+      name={TabDoctor.doctorsTab}
+      component={DoctorsStackScreen}
+      options={{
+        title: 'All Doctors',
+        tabBarIcon: () => {
+          return (
+            <View style={{flexDirection: 'row'}}>
+                <Fontisto
+                  name="doctor"
+                  size={24}
+                  color={appColor.dark.text_secondary}
+                />
+                <Fontisto
+                  name="doctor"
+                  size={24}
+                  color={appColor.dark.text_secondary}
+                />
+              </View>
+          );
+        },
+      }}
+    />
+    <DoctorsTab.Screen
+      name={TabDoctor.uploadDoctorTab}
+      component={UploadDoctorStackScreen}
+      options={{
+        title: 'Add Yourself',
+        tabBarIcon: () => {
+          return (
+            <View style={{flexDirection: 'row'}}>
+                <AntDesign
+                  name="upload"
+                  size={24}
+                  color={appColor.dark.text_secondary}
+                />
+                <Fontisto
+                  name="doctor"
+                  size={24}
+                  color={appColor.dark.text_secondary}
+                />
+              </View>
+          );
+        },
+      }}
+    />
+  </DoctorsTab.Navigator>);
 };

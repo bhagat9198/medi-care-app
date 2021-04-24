@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import {auth, db} from './../firebase';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 const db = firestore();
@@ -11,7 +10,6 @@ export const loginAction = (email, password, userType) => {
     auth()
       .signInWithEmailAndPassword(email, password)
       .then(user => {
-        console.log(user, '======', userType, user.user.uid);
         let storeData = {
           userType: userType,
         };
@@ -21,7 +19,6 @@ export const loginAction = (email, password, userType) => {
       })
       .then(doc => {
         let docData = doc.data();
-        console.log(docData);
         dispatch({
           type: AUTHENTICATION,
           data: {
@@ -47,7 +44,7 @@ export const signupAction = data => {
           userType: data.userType,
         };
         storeUserInfoInApp(storeData);
-        console.log('userId', user.user.uid);
+
         delete data.password;
         U_DATA.userId = user.user.uid;
         U_DATA = {
@@ -69,7 +66,6 @@ export const signupAction = data => {
           U_DATA.offlineConsult = [];
           U_DATA.doctorsVisited = [];
         }
-        console.log(U_DATA);
 
         return db
           .collection(collectionName)

@@ -398,7 +398,7 @@ function DrawerScreens(props) {
   const dispatch = useDispatch();
   return (
     <Drawer.Navigator
-      initialRouteName="doctors"
+      initialRouteName="diseases"
       drawerContent={props => {
         return (
           <DrawerContentScrollView {...props}>

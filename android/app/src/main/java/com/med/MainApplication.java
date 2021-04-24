@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.oblador.vectoricons.VectorIconsPackage;
+import com.chirag.RNMail.*;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -34,6 +35,7 @@ public class MainApplication extends Application implements ReactApplication {
           new AsyncStoragePackage();
           new VectorIconsPackage();
           new ReactNativePushNotificationPackage();
+          new RNMail();
           return packages;
         }
 

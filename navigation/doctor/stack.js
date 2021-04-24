@@ -316,6 +316,38 @@ export const DoctorsStackScreen = props => {
   );
 };
 
+const UploadDoctorStack = createStackNavigator();
+
+export const UploadDoctorStackScreen = props => {
+  return (
+    <UploadDoctorStack.Navigator screenOptions={drawerCommonStyles}>
+      <UploadDoctorStack.Screen
+        name={StackDoctor.uploadDoctor}
+        component={UploadDoctor}
+        options={{
+          title: 'Add Yourself',
+          headerRight: () => {
+            return (
+              <View style={{flexDirection: 'row'}}>
+                <AntDesign
+                  name="upload"
+                  size={24}
+                  color={appColor.dark.text_secondary}
+                />
+                <Fontisto
+                  name="doctor"
+                  size={24}
+                  color={appColor.dark.text_secondary}
+                />
+              </View>
+            );
+          },
+        }}
+      />
+    </UploadDoctorStack.Navigator>
+  );
+};
+
 const AccountStack = createStackNavigator();
 
 export const AccountStackScreen = props => {

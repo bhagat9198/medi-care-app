@@ -14,10 +14,9 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import {
   AccountStackScreen,
   DashboardStackScreen,
-  DoctorsStackScreen
 } from './stack';
 
-import {ArticleTabScreen, ConsultsTabScreen} from './tabBottom';
+import {ArticleTabScreen, ConsultsTabScreen, DoctorsTabScreen} from './tabBottom';
 import {DrawerDoctor} from '../../constants/Navigation';
 
 import {
@@ -36,7 +35,7 @@ function DrawerScreens(props) {
   const dispatch = useDispatch();
   return (
     <Drawer.Navigator
-      initialRouteName={DrawerDoctor.consultsDrawer}
+      initialRouteName={DrawerDoctor.dashboardDrawer}
       drawerContent={props => {
         return (
           <DrawerContentScrollView {...props}>
@@ -96,7 +95,7 @@ function DrawerScreens(props) {
       />
       <Drawer.Screen
         name={DrawerDoctor.doctorsDrawer}
-        component={DoctorsStackScreen}
+        component={DoctorsTabScreen}
         options={{
           title: 'Doctors',
           drawerIcon: () => (

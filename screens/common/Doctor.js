@@ -7,8 +7,7 @@ import {useSelector} from 'react-redux';
 import openMap from 'react-native-open-maps';
 
 export default function Doctor(props) {
-  
-
+  const theme = useSelector(state => state.appReducer.colors);
   return (
     <ThemeProvider theme={theme}>
       <MainContainer>

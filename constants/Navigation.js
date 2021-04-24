@@ -8,6 +8,7 @@ export const StackDoctor = {
   uploadArticle: 'uploadArticle',
   article: 'article',
   doctors: 'doctors',
+  uploadDoctor: 'uploadDoctor',
   doctor: 'doctor',
   account: 'account',
 };
@@ -19,6 +20,8 @@ export const TabDoctor = {
   consultsTab: 'consults',
   onlineConsultsTab: 'onlineConsultsTab',
   offlineConsultsTab: 'offlineConsultsTab',
+  doctorsTab: 'doctorsTab',
+  uploadDoctorTab: 'uploadDoctorTab',
 };
 
 export const DrawerDoctor = {

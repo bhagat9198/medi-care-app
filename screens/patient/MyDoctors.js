@@ -1,62 +1,228 @@
 /* eslint-disable */
 
-import React from 'react';
-import {StyleSheet, View} from 'react-native';
-import styled, {ThemeProvider} from 'styled-components/native';
-import {useSelector} from 'react-redux';
+import React, {useState} from 'react';
+import {Dimensions, ScrollView, TouchableHighlight} from 'react-native';
+import {useSelector, useDispatch} from 'react-redux';
+import styled, {ThemeProvider} from 'styled-components';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
-export default function MyDoctors(props) {
+export default function MyDoctors() {
   const theme = useSelector(state => state.appReducer.colors);
 
-  const regex = /\@[-?\d\.]*\,([-?\d\.]*)/gm;
-  const str = `https://www.google.com/maps/place/Nagappa+Hadli+Hospital/@13.0830973,77.5467358,17z/data=!3m1!4b1!4m5!3m4!1s0x3bae2297a826c479:0x2459f8c0a7fa5742!8m2!3d13.0830973!4d77.5489245`;
-  let m;
+  const eachDoctorUI = () => {
+    return (
+      <EachDoctor
+        style={{
+          marginBottom: Dimensions.get('window').height * 0.05,
+        }}>
+        <DoctorHeading
+          style={{
+            paddingTop: Dimensions.get('window').height * 0.02,
+            paddingBottom: Dimensions.get('window').height * 0.02,
+          }}>
+          <HeadingText>Doctor Name</HeadingText>
+        </DoctorHeading>
+        <DoctorBody>
+          <ScrollView nestedScrollEnabled={true}>
+            <BodyCont
+              style={{
+                paddingTop: Dimensions.get('window').height * 0.02,
+                paddingBottom: Dimensions.get('window').height * 0.02,
+                paddingLeft: Dimensions.get('window').width * 0.02,
+                paddingRight: Dimensions.get('window').width * 0.02,
+              }}></BodyCont>
 
-  while ((m = regex.exec(str)) !== null) {
-    console.log(m, 'jijiji');
-    // This is necessary to avoid infinite loops with zero-width matches
-    if (m.index === regex.lastIndex) {
-      regex.lastIndex++;
-    }
+            <BodyText>Consult History</BodyText>
+            {eachConsultUI()}
+            {eachConsultUI()}
+          </ScrollView>
+        </DoctorBody>
+        <DoctorFooter
+          style={{
+            paddingTop: Dimensions.get('window').height * 0.01,
+            paddingBottom: Dimensions.get('window').height * 0.01,
+          }}>
+          <TouchableHighlight activeOpacity={1}>
+            <FooterCont>
+              <FooterText>More about the doctor</FooterText>
+              <AntDesign
+                name="right"
+                size={24}
+                color="green"
+                style={{
+                  paddingLeft: Dimensions.get('window').width * 0.01,
+                }}
+              />
+            </FooterCont>
+          </TouchableHighlight>
+        </DoctorFooter>
+      </EachDoctor>
+    );
+  };
 
-    // The result can be accessed through the `m`-variable.
-    m.forEach((match, groupIndex) => {
-      console.log(`Found match, group ${groupIndex}: ${match}`);
-    });
-  }
-
-  // const regex1 = /ll=[-?\d\.]*\,([-?\d\.]*)/gm;
-  // const str1 = ` https://maps.google.com/maps?ll=43.6474528,-79.3799409,&amp;z=16&amp;t=m&amp;hl=en-US&amp;gl=US&amp;mapclient=apiv3`;
-  // let m1;
-  // console.log(regex1.exec(str1), 'koko');
-  // while ((m1 = regex1.exec(str1)) !== null) {
-  //   console.log(m1, 'hahah');
-  //   // This is necessary to avoid infinite loops with zero-width matches
-  //   if (m1.index === regex1.lastIndex) {
-  //     regex1.lastIndex++;
-  //   }
-
-  //   // The result can be accessed through the `m`-variable.
-  //   m1.forEach((match, groupIndex) => {
-  //     console.log(`Found match, group ${groupIndex}: ${match}`);
-  //   });
-  // }
+  const eachConsultUI = () => {
+    return (
+      <EachConsult
+        style={{
+          marginBottom: Dimensions.get('window').height * 0.02,
+          marginTop: Dimensions.get('window').height * 0.02,
+        }}>
+        <ConsultHeading>
+          <ConsultDateText>22nc Oct</ConsultDateText>
+          <ConsultDayText>SAT</ConsultDayText>
+        </ConsultHeading>
+        <ConsultBody style={{
+          paddingLeft: Dimensions.get('window').width * 0.02,
+          paddingRight: Dimensions.get('window').width * 0.02,
+        }}>
+          <ConsultDetail
+            style={{
+              paddingBottom: Dimensions.get('window').height * 0.01,
+            }}>
+            <ConsultLabel
+              style={{
+                marginRight: Dimensions.get('window').width * 0.02,
+              }}>
+              <ConsultLabelText>Cause</ConsultLabelText>
+            </ConsultLabel>
+            <ConsultInfo>
+              <ConsultInfoText>
+                gilyfyul sgrnwho owehsgi vhiuw igfsegrhwe ioaugigaw
+              </ConsultInfoText>
+            </ConsultInfo>
+          </ConsultDetail>
+          <ConsultDetail
+            style={{
+              paddingBottom: Dimensions.get('window').height * 0.01,
+            }}>
+            <ConsultLabel
+              style={{
+                marginRight: Dimensions.get('window').width * 0.02,
+              }}>
+              <ConsultLabelText>Cost</ConsultLabelText>
+            </ConsultLabel>
+            <ConsultInfo>
+              <ConsultInfoText>569</ConsultInfoText>
+            </ConsultInfo>
+          </ConsultDetail>
+          <ConsultDetail
+            style={{
+              paddingBottom: Dimensions.get('window').height * 0.01,
+            }}>
+            <ConsultLabel
+              style={{
+                marginRight: Dimensions.get('window').width * 0.02,
+              }}>
+              <ConsultLabelText>Doctor Review</ConsultLabelText>
+            </ConsultLabel>
+            <ConsultInfo>
+              <ConsultInfoText>gilyfyul</ConsultInfoText>
+            </ConsultInfo>
+          </ConsultDetail>
+          <ConsultDetail
+            style={{
+              paddingBottom: Dimensions.get('window').height * 0.01,
+            }}>
+            <ConsultLabel
+              style={{
+                marginRight: Dimensions.get('window').width * 0.02,
+              }}>
+              <ConsultLabelText>Your Review</ConsultLabelText>
+            </ConsultLabel>
+            <ConsultInfo>
+              <ConsultInfoText>gilyfyul</ConsultInfoText>
+            </ConsultInfo>
+          </ConsultDetail>
+        </ConsultBody>
+      </EachConsult>
+    );
+  };
 
   return (
     <ThemeProvider theme={theme}>
       <MainContainer>
-        <Text>My Doctors</Text>
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          nestedScrollEnabled={true}>
+          {eachDoctorUI()}
+          {eachDoctorUI()}
+        </ScrollView>
       </MainContainer>
     </ThemeProvider>
   );
 }
-const MainContainer = styled.View`
-  background-color: ${props => props.theme.primary};
+
+const ConsultInfoText = styled.Text`
+  color: ${props => props.theme.text_primary};
+  font-weight: bold;
+  font-size: 20px;
+`;
+const ConsultLabelText = styled.Text`
+  color: ${props => props.theme.text_primary};
+  font-style: italic;
+  font-size: 19px;
+`;
+const ConsultInfo = styled.View`
+  flex-shrink: 1;
+`;
+const ConsultLabel = styled.View``;
+const ConsultDetail = styled.View`
+  flex-direction: row;
+`;
+const ConsultBody = styled.View``;
+const ConsultDayText = styled.Text`
+  font-size: 17px;
+  color: orange;
+`;
+const ConsultDateText = styled.Text`
+  font-size: 20px;
+  color: yellow;
+`;
+const ConsultHeading = styled.View`
+  flex-direction: row;
+  align-items: flex-end;
+`;
+const EachConsult = styled.View``;
+
+const FooterText = styled.Text`
+  color: green;
+  font-size: 18px;
+`;
+
+const DoctorFooter = styled.View`
+  align-items: center;
+`;
+
+const FooterCont = styled.View`
+  flex-direction: row;
+`;
+
+const BodyText = styled.Text`
+  color: ${props => props.theme.text_primary};
+`;
+
+const BodyCont = styled.View``;
+
+const DoctorBody = styled.View`
   flex: 1;
 `;
 
-const Text = styled.Text`
-  color: white;
+const HeadingText = styled.Text`
+  color: red;
+  font-size: 22px;
 `;
 
-const styles = StyleSheet.create({});
+const DoctorHeading = styled.View`
+  background-color: ${props => props.theme.secondary};
+  align-items: center;
+`;
+const EachDoctor = styled.View`
+  height: 400px;
+  border-bottom-width: 1px;
+  border-bottom-color: ${props => props.theme.text_primary};
+`;
+
+const MainContainer = styled.View`
+  flex: 1;
+  background-color: ${props => props.theme.primary};
+`;
