@@ -5,29 +5,18 @@ import {ScrollView} from 'react-native';
 import styled, {ThemeProvider} from 'styled-components';
 import {useDispatch, useSelector} from 'react-redux';
 
-export default function offlineConsults() {
+export default function Appointments() {
   const theme = useSelector(state => state.appReducer.colors);
-  const allConsultsUI = () => {
-    return(
-      <AllConsults>
-        <EachConsult></EachConsult>
-        <EachConsult></EachConsult>
-      </AllConsults>
-    )
-  }
-
   return (
     <ThemeProvider theme={theme}>
       <ScrollView contentContainerStyle={{flexGrow: 1}}>
         <MainContainer>
-          {allConsultsUI()}
+          
         </MainContainer>
       </ScrollView>
     </ThemeProvider>
   );
 }
-
-const AllConsults = styled.View``;
 
 const MainContainer = styled.View`
   flex: 1;

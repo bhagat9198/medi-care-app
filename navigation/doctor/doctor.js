@@ -40,7 +40,6 @@ function DrawerScreens(props) {
         return (
           <DrawerContentScrollView {...props}>
             <DrawerItemList {...props} />
-
             <DrawerItem
               label="Logout"
               onPress={() => {

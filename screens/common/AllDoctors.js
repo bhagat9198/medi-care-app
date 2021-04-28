@@ -160,7 +160,7 @@ const EachDocCont = styled.View`
   width: 95%;
   border-radius: 10px;
   align-items: center;
-  border-width: 1;
+  border-width: 1px;
   border-radius: 20px;
   height: 120px;
 `;

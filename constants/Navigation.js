@@ -31,3 +31,14 @@ export const DrawerDoctor = {
   accountDrawer: 'accountDrawer',
   consultsDrawer: 'consultsDrawer',
 };
+
+export const DrawerPatient = {
+  dashboardDrawer: 'dashboardDrawer',
+  articlesDrawer: 'articlesDrawer',
+  doctorsDrawer: 'doctorsDrawer',
+  medReportsDrawer: 'medReportsDrawer',
+  remindersDrawer: 'remindersDrawer',
+  diseasesDrawer: 'diseasesDrawer',
+  onlineConsultsDrawer: 'onlineConsultsDrawer',
+  offlineConsultsDrawer: 'offlineConsultsDrawer',
+};

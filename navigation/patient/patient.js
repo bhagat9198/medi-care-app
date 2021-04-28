@@ -33,6 +33,7 @@ import Reminders from '../../screens/patient/Reminders';
 import Article from '../../screens/common/Article';
 import {logout} from './../../store/actions/auth';
 import {appColor} from './../../constants/App';
+import {DrawerPatient} from './../../constants/Navigation';
 
 const BottomTab = createBottomTabNavigator();
 
@@ -398,7 +399,7 @@ function DrawerScreens(props) {
   const dispatch = useDispatch();
   return (
     <Drawer.Navigator
-      initialRouteName="diseases"
+      initialRouteName={DrawerPatient.onlineConsultsDrawer}
       drawerContent={props => {
         return (
           <DrawerContentScrollView {...props}>
@@ -429,7 +430,7 @@ function DrawerScreens(props) {
         inactiveTintColor: appColor.dark.text_primary,
       }}>
       <Drawer.Screen
-        name="allArticles"
+        name={DrawerPatient.articlesDrawer}
         component={AllArticlesStackScreen}
         options={{
           title: 'Articles',
@@ -443,7 +444,7 @@ function DrawerScreens(props) {
         }}
       />
       <Drawer.Screen
-        name="dashboard"
+        name={DrawerPatient.dashboardDrawer}
         component={DashboardStackScreen}
         options={{
           drawerIcon: () => (
@@ -457,7 +458,7 @@ function DrawerScreens(props) {
         }}
       />
       <Drawer.Screen
-        name="onlineConsults"
+        name={DrawerPatient.onlineConsultsDrawer}
         component={OnlineConsultsStackScreen}
         options={{
           title: 'Online Consults',
@@ -471,7 +472,7 @@ function DrawerScreens(props) {
         }}
       />
       <Drawer.Screen
-        name="offlineConsults"
+        name={DrawerPatient.offlineConsultsDrawer}
         component={OfflineConsultsStackScreen}
         options={{
           title: 'Offline Consults',
@@ -485,7 +486,7 @@ function DrawerScreens(props) {
         }}
       />
       <Drawer.Screen
-        name="diseases"
+        name={DrawerPatient.diseasesDrawer}
         component={DiseasesStackScreen}
         options={{
           title: 'Diseases I Have',
@@ -499,7 +500,7 @@ function DrawerScreens(props) {
         }}
       />
       <Drawer.Screen
-        name="doctors"
+        name={DrawerPatient.doctorsDrawer}
         component={AllDoctorsBottomTab}
         options={{
           title: 'My Doctors',
@@ -513,7 +514,7 @@ function DrawerScreens(props) {
         }}
       />
       <Drawer.Screen
-        name="medReports"
+        name={DrawerPatient.medReportsDrawer}
         component={MedReportsStackScreen}
         options={{
           title: 'My Med Reports',
@@ -527,7 +528,7 @@ function DrawerScreens(props) {
         }}
       />
       <Drawer.Screen
-        name="reminders"
+        name={DrawerPatient.remindersDrawer}
         component={RemindersStackScreen}
         options={{
           title: 'My Reminders',

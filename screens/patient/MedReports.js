@@ -5,93 +5,276 @@ import {useSelector, useDispatch} from 'react-redux';
 import styled, {ThemeProvider} from 'styled-components';
 import email from 'react-native-email';
 import Mailer from 'react-native-mail';
-import {Button, Alert} from 'react-native';
+import {
+  Button,
+  Alert,
+  Dimensions,
+  ScrollView,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 
-export default function MedReports() {
+export default function MedReports(props) {
   const [filePath, setFilePath] = useState(null);
   const [mimeType, setmimeType] = useState(null);
   const theme = useSelector(state => state.appReducer.colors);
 
-  const handleEmail = () => {
-    const to = ['tiaan@email.com', 'foo@bar.com']; // string or array of email addresses
-    email(to, {
-      // Optional additional arguments
-      cc: ['bazzy@moo.com', 'doooo@daaa.com'], // string or array of email addresses
-      bcc: 'mee@mee.com', // string or array of email addresses
-      subject: 'Show how to use',
-      body: 'Some body right here',
-    }).catch(console.error);
-  };
+  const [to, setTo] = useState(null);
+  const [bcc, setBcc] = useState(null);
+  const [ccc, setCcc] = useState(null);
+  const [subject, setSubject] = useState(null);
+  const [mailBody, setMailBody] = useState(null);
 
-  const openGalleryHandler = () => {
-    ImagePicker.openPicker({
-      width: 300,
-      height: 300,
-    }).then(images => {
-      console.log(images);
-      console.log(images.path);
-      console.log(images.mime);
-      setFilePath(images.path);
-      setmimeType(images.mime);
-    });
-  };
+  // const handleEmail = () => {
+  //   const to = ['tiaan@email.com', 'foo@bar.com']; // string or array of email addresses
+  //   email(to, {
+  //     // Optional additional arguments
+  //     cc: ['bazzy@moo.com', 'doooo@daaa.com'], // string or array of email addresses
+  //     bcc: 'mee@mee.com', // string or array of email addresses
+  //     subject: 'Show how to use',
+  //     body: 'Some body right here',
+  //   }).catch(console.error);
+  // };
 
-  const handleMailer = () => {
-    console.log(Mailer);
-    console.log(filePath, mimeType);
-    Mailer.mail(
-      {
-        subject: 'need help',
-        recipients: ['support@example.com'],
-        ccRecipients: ['supportCC@example.com'],
-        bccRecipients: ['supportBCC@example.com'],
-        body: '<b>A Bold Body</b>',
-        isHTML: true,
-        attachments: [
-          {
-            // Specify either `path` or `uri` to indicate where to find the file data.
-            // The API used to create or locate the file will usually indicate which it returns.
-            // An absolute path will look like: /cacheDir/photos/some image.jpg
-            // A URI starts with a protocol and looks like: content://appname/cacheDir/photos/some%20image.jpg
-          // The absolute path of the file from which to read data.
-            path: filePath, // The uri of the file from which to read the data.
-            // Specify either `type` or `mimeType` to indicate the type of data.
-            type: mimeType, // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+  // const openGalleryHandler = () => {
+  //   ImagePicker.openPicker({
+  //     width: 300,
+  //     height: 300,
+  //   }).then(images => {
+  //     console.log(images);
+  //     console.log(images.path);
+  //     console.log(images.mime);
+  //     setFilePath(images.path);
+  //     setmimeType(images.mime);
+  //   });
+  // };
 
-          },
-        ],
-      },
-      (error, event) => {
-        Alert.alert(
-          error,
-          event,
-          [
-            {
-              text: 'Ok',
-              onPress: () => console.log('OK: Email Error Response'),
-            },
-            {
-              text: 'Cancel',
-              onPress: () => console.log('CANCEL: Email Error Response'),
-            },
-          ],
-          {cancelable: true},
-        );
-      },
-    );
-  };
+  // const handleMailer = () => {
+  //   console.log(Mailer);
+  //   console.log(filePath, mimeType);
+  //   Mailer.mail(
+  //     {
+  //       subject: 'need help',
+  //       recipients: ['support@example.com'],
+  //       ccRecipients: ['supportCC@example.com'],
+  //       bccRecipients: ['supportBCC@example.com'],
+  //       body: '<b>A Bold Body</b>',
+  //       isHTML: true,
+  //       attachments: [
+  //         {
+  //           // Specify either `path` or `uri` to indicate where to find the file data.
+  //           // The API used to create or locate the file will usually indicate which it returns.
+  //           // An absolute path will look like: /cacheDir/photos/some image.jpg
+  //           // A URI starts with a protocol and looks like: content://appname/cacheDir/photos/some%20image.jpg
+  //           // The absolute path of the file from which to read data.
+  //           path: filePath, // The uri of the file from which to read the data.
+  //           // Specify either `type` or `mimeType` to indicate the type of data.
+  //           type: 'png', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+  //         },
+  //       ],
+  //     },
+  //     (error, event) => {
+  //       Alert.alert(
+  //         error,
+  //         event,
+  //         [
+  //           {
+  //             text: 'Ok',
+  //             onPress: () => console.log('OK: Email Error Response'),
+  //           },
+  //           {
+  //             text: 'Cancel',
+  //             onPress: () => console.log('CANCEL: Email Error Response'),
+  //           },
+  //         ],
+  //         {cancelable: true},
+  //       );
+  //     },
+  //   );
+  // };
 
   return (
     <ThemeProvider theme={theme}>
-      <MainContainer>
-        <Button title="add Email" onPress={handleEmail} />
-        <Button title="add Img" onPress={openGalleryHandler} />
-        <Button title="add Mailer" onPress={handleMailer} />
-      </MainContainer>
+      <ScrollView contentContainerStyle={{flexGrow: 1}}>
+        <KeyboardAvoidingView style={{flex: 1}}>
+          <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+            <MainContainer
+              style={{
+                paddingLeft: Dimensions.get('window').width * 0.02,
+                paddingRight: Dimensions.get('window').width * 0.02,
+                paddingBottom: Dimensions.get('window').height * 0.08,
+
+              }}>
+              <InputCont style={{
+                marginBottom: Dimensions.get('window').height * 0.03,
+              }} >
+                <InputLabel
+                  style={{
+                    paddingLeft: Dimensions.get('window').width * 0.02,
+                    paddingRight: Dimensions.get('window').width * 0.02,
+                  }}>
+                  <LabelText>To :</LabelText>
+                </InputLabel>
+                <Input
+                  autoCompleteType="email"
+                  autoCorrect={false}
+                  autoFocus={true}
+                  blurOnSubmit={true}
+                  keyboardType="email-address"
+                  onChangeText={(txt) => setTo(txt)}
+                  placeholder="Sender Email Address"
+                  placeholderTextColor={theme.text_secondary}
+                  style={{
+                    borderBottomWidth: 1,
+                    borderBottomColor: 'white',
+                  }}
+                  value={to}
+                />
+              </InputCont>
+              <InputCont style={{
+                marginBottom: Dimensions.get('window').height * 0.03,
+              }} >
+                <InputLabel
+                  style={{
+                    paddingLeft: Dimensions.get('window').width * 0.02,
+                    paddingRight: Dimensions.get('window').width * 0.02,
+                  }}>
+                  <LabelText>Bcc :</LabelText>
+                </InputLabel>
+                <Input
+                  autoCompleteType="email"
+                  autoCorrect={false}
+                  autoFocus={true}
+                  blurOnSubmit={true}
+                  keyboardType="email-address"
+                  onChangeText={txt => setBcc(txt)}
+                  placeholder="Bcc Email Address"
+                  placeholderTextColor={theme.text_secondary}
+                  style={{
+                    borderBottomWidth: 1,
+                    borderBottomColor: 'white',
+                  }}
+                  value={bcc}
+                />
+              </InputCont>
+              <InputCont style={{
+                marginBottom: Dimensions.get('window').height * 0.03,
+              }} >
+                <InputLabel
+                  style={{
+                    paddingLeft: Dimensions.get('window').width * 0.02,
+                    paddingRight: Dimensions.get('window').width * 0.02,
+                  }}>
+                  <LabelText>Ccc :</LabelText>
+                </InputLabel>
+                <Input
+                  autoCompleteType="email"
+                  autoCorrect={false}
+                  autoFocus={true}
+                  blurOnSubmit={true}
+                  keyboardType="email-address"
+                  onChangeText={txt => setCcc(txt)}
+                  placeholder="Ccc Email Address"
+                  placeholderTextColor={theme.text_secondary}
+                  style={{
+                    borderBottomWidth: 1,
+                    borderBottomColor: 'white',
+                  }}
+                  value={ccc}
+                />
+              </InputCont>
+              <InputCont style={{
+                marginBottom: Dimensions.get('window').height * 0.03,
+              }}  flexColoumn={true}>
+                <InputLabel
+                  style={{
+                    paddingLeft: Dimensions.get('window').width * 0.02,
+                    paddingRight: Dimensions.get('window').width * 0.02,
+                  }}>
+                  <LabelText>Subject :</LabelText>
+                </InputLabel>
+                <Input
+                  autoCompleteType="email"
+                  autoCorrect={false}
+                  autoFocus={true}
+                  blurOnSubmit={true}
+                  onChangeText={txt => setSubject(txt)}
+                  placeholder="Email Subject"
+                  placeholderTextColor={theme.text_secondary}
+                  style={{
+                    borderBottomWidth: 1,
+                    borderBottomColor: 'white',
+                  }}
+                  value={subject}
+                  multiline={true}
+                  numberOfLines={2} 
+                />
+              </InputCont>
+              <InputCont style={{
+                marginBottom: Dimensions.get('window').height * 0.03,
+              }}  flexColoumn={true}>
+                <InputLabel
+                  style={{
+                    paddingLeft: Dimensions.get('window').width * 0.02,
+                    paddingRight: Dimensions.get('window').width * 0.02,
+                  }}>
+                  <LabelText>Mail Body :</LabelText>
+                </InputLabel>
+                <Input
+                  autoCompleteType="email"
+                  autoCorrect={false}
+                  autoFocus={true}
+                  blurOnSubmit={true}
+                  onChangeText={txt => setMailBody(txt)}
+                  placeholder="Email Body"
+                  placeholderTextColor={theme.text_secondary}
+                  style={{
+                    borderBottomWidth: 1,
+                    borderBottomColor: 'white',
+                  }}
+                  value={mailBody}
+                  multiline={true}
+                  numberOfLines={2}
+                />
+              </InputCont>
+
+              <BtnContainer style={{
+                marginTop: Dimensions.get('window').height * 0.03,
+                marginBottom: Dimensions.get('window').height * 0.03,
+              }}>
+                <Button title="Send Mail" />
+              </BtnContainer>
+            </MainContainer>
+
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </ScrollView>
     </ThemeProvider>
   );
 }
+
+const BtnContainer = styled.View``;
+
+const Input = styled.TextInput`
+  flex: 1;
+  color: ${props => props.theme.text_primary};
+  font-size: 20px;
+  justify-content: flex-start;
+  /* width: 100%; */
+`;
+const LabelText = styled.Text`
+  color: ${props => props.theme.text_primary};
+  font-size: 20px;
+`;
+const InputLabel = styled.View`
+  justify-content: center;
+`;
+const InputCont = styled.View`
+
+  flex-direction: ${props => (props.flexColoumn ? 'column' : 'row')};
+`;
 
 const MainContainer = styled.View`
   flex: 1;
