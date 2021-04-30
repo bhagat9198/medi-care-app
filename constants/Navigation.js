@@ -36,9 +36,32 @@ export const DrawerPatient = {
   dashboardDrawer: 'dashboardDrawer',
   articlesDrawer: 'articlesDrawer',
   doctorsDrawer: 'doctorsDrawer',
+  myDoctorsDrawer: 'myDoctorsDrawer',
   medReportsDrawer: 'medReportsDrawer',
   remindersDrawer: 'remindersDrawer',
   diseasesDrawer: 'diseasesDrawer',
-  onlineConsultsDrawer: 'onlineConsultsDrawer',
-  offlineConsultsDrawer: 'offlineConsultsDrawer',
+  consultsDrawer: 'consultsDrawer',
+  appointmentsDrawer: 'appointmentsDrawer',
+  accountDrawer: 'accountDrawer',
+};
+
+export const StackPatient = {
+  dashboard: 'dashboard',
+  allDoctors: 'allDoctors',
+  doctor: 'doctor',
+  diseases: 'diseases',
+  allArticles: 'allArticles',
+  article: 'article',
+  onlineConsults: 'onlineConsults',
+  offlineConsults: 'offlineConsults',
+  reminders: 'reminders',
+  medReports: 'medReports',
+  myDoctors: 'myDoctors',
+  appointments: 'appointments',
+  account: 'account',
+};
+
+export const TabPatient = {
+  onlineConsults: 'onlineConsults',
+  offlineConsults: 'offlineConsults',
 };

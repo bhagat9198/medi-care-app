@@ -1,8 +1,9 @@
+/* eslint-disable */
+
 import React, {useState} from 'react';
 import {
   Modal,
   View,
-  Text,
   TextInput,
   StyleSheet,
   ScrollView,
@@ -20,6 +21,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {signupAction} from '../store/actions/auth';
 
 export default function SignupModal(props) {
+  const [initailName, setInitailName] = useState('');
   const [fName, setFName] = useState('');
   const [lName, setLName] = useState('');
   const [age, setAge] = useState('');
@@ -34,14 +36,17 @@ export default function SignupModal(props) {
     setGender(val);
   };
 
+  const initialNameHandler = val => {
+    setInitailName(val);
+  };
+
   const userTypeHandler = val => {
     setUserType(val);
   };
 
-  const appUserState = useSelector(state => state.authReducer);
   const dispatch = useDispatch();
 
-  const registerUser = () => {
+  const registerUser = async () => {
     console.log(
       fName,
       lName,
@@ -75,7 +80,11 @@ export default function SignupModal(props) {
       return Alert.alert('Empty Field', "None of the field's should be empty");
     }
 
-    if (userType === 'You are' || gender === 'Select Gender') {
+    if (
+      userType === 'You are' ||
+      gender === 'Select Gender' ||
+      initailName === 'Initial Name'
+    ) {
       return Alert.alert(
         'Inappropriate Value',
         'Please select valid value from dropdown.',
@@ -83,6 +92,7 @@ export default function SignupModal(props) {
     }
 
     let signupData = {
+      initailName,
       fName,
       lName,
       email,
@@ -93,7 +103,14 @@ export default function SignupModal(props) {
       userType,
     };
     Keyboard.dismiss();
-    dispatch(signupAction(signupData));
+    let result = await dispatch(signupAction(signupData));
+    console.log('result signup', result);
+
+      if (!result.userStatus) {
+        props.setErrorHandler(result.message);
+        return Alert.alert('LogIn Error', result.message);
+      }
+
   };
 
   return (
@@ -104,6 +121,21 @@ export default function SignupModal(props) {
       <View style={styles.modalWholeView}>
         <ScrollView>
           <KeyboardAvoidingView style={styles.loginForm}>
+            <Picker
+              selectedValue={initailName}
+              onValueChange={val => initialNameHandler(val)}
+              mode={Platform.OS === 'android' ? 'dropdown' : 'dialog'}
+              style={styles.picker}
+              dropdownIconColor="gray">
+              <Picker.Item
+                label="Initial Name"
+                value="Initial Name"
+                enabled={true}
+              />
+              <Picker.Item label="Mr." value="Mr" />
+              <Picker.Item label="Miss." value="Miss" />
+              <Picker.Item label="Dr." value="Dr." />
+            </Picker>
             <TextInput
               style={styles.inputBox}
               autoCompleteType="name"
@@ -124,7 +156,7 @@ export default function SignupModal(props) {
             />
             <TextInput
               style={styles.inputBox}
-              placeholder="XX"
+              placeholder="Age - XX"
               placeholderTextColor="gray"
               keyboardType="number-pad"
               color={appColor.dark.text_primary}
@@ -186,7 +218,7 @@ export default function SignupModal(props) {
             />
             <TextInput
               style={styles.inputBox}
-              placeholder="XXXXXXXXXX"
+              placeholder="Phone - docXXXXXXXXXX"
               placeholderTextColor="gray"
               keyboardType="number-pad"
               color={appColor.dark.text_primary}

@@ -22,7 +22,7 @@ import SignupModal from './SignupModal';
 import {appConstant, appColor} from '../constants/App';
 import {loginAction} from './../store/actions/auth';
 
-export default function LogIn() {
+export default function LogIn(props) {
   const dispatch = useDispatch();
   const [modalDisplay, setModalisplay] = useState(false);
   const modalHandler = () => {
@@ -32,7 +32,7 @@ export default function LogIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const loginHandler = () => {
+  const loginHandler = async () => {
     if (!email || !password || !userType) {
       return Alert.alert('Empty Field', "None of the field's should be empty");
     }
@@ -42,7 +42,13 @@ export default function LogIn() {
         'Please select valid value from dropdown.',
       );
     }
-    dispatch(loginAction(email, password, userType));
+    let result = await dispatch(loginAction(email, password, userType));
+    console.log('result signIN', result);
+      if (!result.userStatus) {
+        props.setErrorHandler(result.message);
+        return Alert.alert('LogIn Error', result.message);
+      }
+    
   };
 
   return (
@@ -101,8 +107,7 @@ export default function LogIn() {
                     onValueChange={val => setUserType(val)}
                     mode={Platform.OS === 'android' ? 'dropdown' : 'dialog'}
                     style={styles.picker}
-                    dropdownIconColor="gray"
-                    >
+                    dropdownIconColor="gray">
                     <Picker.Item
                       label="You are"
                       value="You are"
@@ -111,15 +116,14 @@ export default function LogIn() {
                     <Picker.Item label="Patient" value="patients" />
                     <Picker.Item label="Doctor" value="doctors" />
                   </Picker>
-                </View> 
+                </View>
               </View>
-                <Button
-                  title="Log In"
-                  color={appColor.dark.secondary}
-                  onPress={loginHandler}
-                  style={{flex: 1}}
-                />
-    
+              <Button
+                title="Log In"
+                color={appColor.dark.secondary}
+                onPress={loginHandler}
+                style={{flex: 1}}
+              />
             </View>
 
             <View style={styles.footerContainer}>
@@ -132,7 +136,11 @@ export default function LogIn() {
           </View>
         </KeyboardAvoidingView>
       </ScrollView>
-      <SignupModal modalStatus={modalDisplay} onClick={modalHandler} />
+      <SignupModal
+        setErrorHandler={msg => props.setErrorHandler(msg)}
+        modalStatus={modalDisplay}
+        onClick={modalHandler}
+      />
     </SafeAreaView>
   );
 }

@@ -1,14 +1,16 @@
 /* eslint-disable */
 
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import {useDispatch, useSelector} from 'react-redux';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import {Button, Dimensions, TouchableWithoutFeedback} from 'react-native';
+import {StackPatient} from '../constants/Navigation';
 
-export default function EachConsult() {
+export default function EachConsult(props) {
   const theme = useSelector(state => state.appReducer.colors);
+  console.log('lol',props);
   return (
     <EachConsultCont
       style={{
@@ -16,7 +18,10 @@ export default function EachConsult() {
         marginBottom: Dimensions.get('window').height * 0.02,
         paddingTop: Dimensions.get('window').height * 0.01,
       }}>
-      <TouchableWithoutFeedback>
+      <TouchableWithoutFeedback onPress={() => {
+        console.log(props.navigation);
+        return props.navigation.navigate( StackPatient.doctor, {data: 'lol'})
+      }}>
         <ConsultDetailCont>
           <LeftCont
             style={{
@@ -58,7 +63,7 @@ export default function EachConsult() {
         </ConsultDetailCont>
       </TouchableWithoutFeedback>
       <BookCont>
-        <Button title="Book Appointment" color="green" />
+        <Button title="Book Appointment" color="green" onPress={props.modalHandler} />
       </BookCont>
     </EachConsultCont>
   );

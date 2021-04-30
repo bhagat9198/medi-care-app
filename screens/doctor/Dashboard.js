@@ -93,9 +93,9 @@ const CardHeading = styled.View`
   align-items: center;
 `;
 const EachCard = styled.View`
-  border-radius: 10;
+  border-radius: 10px;
   border-color: ${props => props.theme.text_secondary};
-  border-width: 1;
+  border-width: 1px;
 `;
 const AllCards = styled.View`
   margin-bottom: 50px;

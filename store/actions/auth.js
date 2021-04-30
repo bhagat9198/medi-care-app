@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -7,9 +9,13 @@ export const LOGOUT = 'LOGOUT';
 
 export const loginAction = (email, password, userType) => {
   return (dispatch, getState) => {
-    auth()
+    return auth()
       .signInWithEmailAndPassword(email, password)
       .then(user => {
+        if(!user) {
+          return {userStatus: false, message: 'Invalid Creditionals'};
+        }
+        console.log('user.user', user.user);
         let storeData = {
           userType: userType,
         };
@@ -17,18 +23,23 @@ export const loginAction = (email, password, userType) => {
 
         return db.collection(userType).doc(user.user.uid).get();
       })
-      .then(doc => {
+      .then(async(doc) => {
         let docData = doc.data();
-        dispatch({
+        if(!docData) {
+          return {userStatus: false, message: 'Invalid Creditionals. Please double check your user type ie doctor or patient'};
+        }
+        await dispatch({
           type: AUTHENTICATION,
           data: {
             ...docData,
           },
         });
+        return {userStatus: true, message: 'User LogedIn'}; 
       })
       .catch(error => {
         console.log('hello ERRORRR');
         console.log(error);
+        return {userStatus: false, message: error.message};
       });
   };
 };
@@ -36,9 +47,10 @@ export const loginAction = (email, password, userType) => {
 export const signupAction = data => {
   return (dispatch, getState) => {
     let U_DATA = {};
-    auth()
+    return auth()
       .createUserWithEmailAndPassword(data.email, data.password)
       .then(user => {
+        console.log('user ss', user);
         // let token = user.user.toJSON().stsTokenManager;
         let storeData = {
           userType: data.userType,
@@ -51,8 +63,10 @@ export const signupAction = data => {
           ...U_DATA,
           ...data,
         };
+        console.log('U_DATA', U_DATA);
         let collectionName = 'patients';
-        if (data.userType === 'doctor') {
+        console.log('data.userType', data.userType, data.userType=='doctors');
+        if (data.userType == 'doctors') {
           collectionName = 'doctors';
           U_DATA.registeredPatients = [];
           U_DATA.appointments = [];
@@ -75,62 +89,59 @@ export const signupAction = data => {
           });
       })
       .then(() => {
+
+        console.log('one creadting');
         dispatch({
           type: AUTHENTICATION,
-          data: {
+          data: { 
             ...U_DATA,
           },
         });
+        return {userStatus: true, message: 'User Created'};
       })
       .catch(error => {
         console.log(error);
+        return {userStatus: false, message: error.message};
       });
   };
 };
 
 export const autoLogin = () => {
   return dispatch => {
-    // let extractAsyncData = async () => {
-    //   let extractedData = await AsyncStorage.getItem("@loggedIn_user");
-    //   let userData = await JSON.parse(extractedData);
-    //   let currentDate = new Date();
-    //   let expirationTime = new Date(new Date().getTime() + +userData.expirationTime * 1000);
-    //   if(expirationTime > currentDate) {
-    //     // console.log(expirationTime.getTime(), currentDate.getTime());
-    // login user
-    //   }
-    // };
-    // extractAsyncData()
-    //   .then()
-    //   .catch((error) => console.log(error));
-
-    auth().onAuthStateChanged(async user => {
+    return auth().onAuthStateChanged(async(user) => {
       if (user) {
-        console.log('sgflvsgiufgisg----------');
         let U_DATA = {};
         // change screen to dashbaord
+        console.log('USER', user);
         let extractedData = await AsyncStorage.getItem('@userType');
         let userData = await JSON.parse(extractedData);
+        console.log('userData', userData);
+
         let collectionName = 'patients';
-        if (userData.userType === 'doctors') {
+        if (userData.userType == 'doctors') {
           collectionName = 'doctors';
         }
-
-        db.collection(collectionName)
+        console.log('collectionName', collectionName);
+        return await db.collection(collectionName)
           .doc(user.uid)
           .get()
-          .then(doc => {
+          .then(async(doc) => {
             let docData = doc.data();
             U_DATA = {...docData};
-            dispatch({
+            await dispatch({
               type: AUTHENTICATION,
               data: {
                 ...U_DATA,
               },
             });
-          });
+            console.log('done');
+            return {userStatus: true, message: 'Auto Login Success'}
+          }).catch(error => {
+            return {userStatus: false, message: error.message}
+          })
       } else {
         // keep screen to login
+        return {userStatus: false, message: 'User Not Found'};
       }
     });
   };

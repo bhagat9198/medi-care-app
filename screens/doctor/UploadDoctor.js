@@ -8,51 +8,37 @@ import {
   Image,
   KeyboardAvoidingView,
   ScrollView,
-  TouchableNativeFeedback,
   Keyboard,
   TouchableWithoutFeedback,
   View,
   Dimensions,
-  StyleSheet,
   Button,
+  Alert,
 } from 'react-native';
 
+import {uploadDoctor} from './../../store/actions/doctor';
+ 
 export default UploadArticle = props => {
   const theme = useSelector(state => state.appReducer.colors);
   const [imgs, setImgs] = useState([]);
+  const [uploadImgs, setUploadImgs] = useState(false);
+  const dispatch = useDispatch();
 
-  const regex = /\@[-?\d\.]*\,([-?\d\.]*)/gm;
-  const str = `https://www.google.com/maps/place/Nagappa+Hadli+Hospital/@13.0830973,77.5467358,17z/data=!3m1!4b1!4m5!3m4!1s0x3bae2297a826c479:0x2459f8c0a7fa5742!8m2!3d13.0830973!4d77.5489245`;
-  let m;
+  const getLatLon = () => {
+    const regex = /\@[-?\d\.]*\,([-?\d\.]*)/gm;
+    let m;
 
-  while ((m = regex.exec(str)) !== null) {
-    // This is necessary to avoid infinite loops with zero-width matches
-    if (m.index === regex.lastIndex) {
-      regex.lastIndex++;
+    while ((m = regex.exec(locationUrl)) !== null) {
+      // This is necessary to avoid infinite loops with zero-width matches
+      if (m.index === regex.lastIndex) {
+        regex.lastIndex++;
+      }
+      let [lat, long] = m[0].split(',');
+      lat = lat.split('@')[1];
+      console.log(lat, long, 'aaaa');
+      return [lat, long];
     }
-
-    // The result can be accessed through the `m`-variable.
-    m.forEach((match, groupIndex) => {
-      console.log(`Found match, group ${groupIndex}: ${match}`);
-    });
-  }
-
-  // const regex1 = /ll=[-?\d\.]*\,([-?\d\.]*)/gm;
-  // const str1 = ` https://maps.google.com/maps?ll=43.6474528,-79.3799409,&amp;z=16&amp;t=m&amp;hl=en-US&amp;gl=US&amp;mapclient=apiv3`;
-  // let m1;
-  // console.log(regex1.exec(str1), 'koko');
-  // while ((m1 = regex1.exec(str1)) !== null) {
-  //   console.log(m1, 'hahah');
-  //   // This is necessary to avoid infinite loops with zero-width matches
-  //   if (m1.index === regex1.lastIndex) {
-  //     regex1.lastIndex++;
-  //   }
-
-  //   // The result can be accessed through the `m`-variable.
-  //   m1.forEach((match, groupIndex) => {
-  //     console.log(`Found match, group ${groupIndex}: ${match}`);
-  //   });
-  // }
+  };
 
   const openGalleryHandler = () => {
     ImagePicker.openPicker({
@@ -89,6 +75,51 @@ export default UploadArticle = props => {
     ));
   };
 
+  const [name, setName] = useState('');
+  const [specializations, setSpecializations] = useState('');
+  const [location, setLocation] = useState('');
+  const [locationUrl, setLocationUrl] = useState('');
+  const [about, setAbout] = useState('');
+  const [services, setServices] = useState('');
+
+  const submitUploadDoctor = async() => {
+    // if(!name || !specializations || !location || !locationUrl || !about || !services) {
+    //   return Alert.alert('Incomplete Form', 'Please fill all the details in order to upload yourslef');
+    // }
+    let lat, long;
+    
+
+    // if(!uploadImgs) {
+    //   console.log('hey');
+    //   return Alert.alert(
+    //     'No Images',
+    //     'Are you sure you want to proceed without any images?',
+    //     [
+    //       {text: 'Cancel', onPress: () => console.log('Cancel Pressed!')},
+    //       {text: 'Confirm', onPress: () => setUploadImgs(true)},
+    //     ],
+        
+    //   );
+    // }  
+
+    
+
+    // try {
+    //   [lat, long] = getLatLon();
+    // } catch (error) {
+    //   return Alert.alert(
+    //     'Invalid URL',
+    //     'Please copy the correct URL from address bar of browser.',
+    //   );
+    // }
+
+    let wholeData = {
+      imgs
+    }
+    let res = await dispatch(uploadDoctor(wholeData));
+    console.log(res);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <View
@@ -111,14 +142,20 @@ export default UploadArticle = props => {
                     }}
                     placeholder="Name of Hospital/Clinic"
                     placeholderTextColor={theme.text_primary}
+                    value={name}
+                    onChangeText={txt => setName(txt)}
                   />
                   <TextInput
                     style={{
                       marginBottom: Dimensions.get('window').height * 0.05,
                       borderRadius: 50,
                     }}
-                    placeholder="Specialization/Specialist"
+                    placeholder="Specializations (seprate with comma ' , ' )"
                     placeholderTextColor={theme.text_primary}
+                    multiline={true}
+                    numberOfLines={2}
+                    value={specializations}
+                    onChangeText={txt => setSpecializations(txt)}
                   />
                   <TextInput
                     style={{
@@ -127,6 +164,8 @@ export default UploadArticle = props => {
                     }}
                     placeholder="Location"
                     placeholderTextColor={theme.text_primary}
+                    value={location}
+                    onChangeText={txt => setLocation(txt)}
                   />
                   <TextInput
                     style={{
@@ -136,6 +175,8 @@ export default UploadArticle = props => {
                     placeholderTextColor={theme.text_primary}
                     multiline={true}
                     numberOfLines={3}
+                    value={locationUrl}
+                    onChangeText={txt => setLocationUrl(txt)}
                   />
                   <TextInput
                     style={{
@@ -145,8 +186,9 @@ export default UploadArticle = props => {
                     placeholderTextColor={theme.text_primary}
                     multiline={true}
                     numberOfLines={5}
+                    value={about}
+                    onChangeText={txt => setAbout(txt)}
                   />
-
                   <TextInput
                     style={{
                       marginBottom: Dimensions.get('window').height * 0.05,
@@ -155,6 +197,8 @@ export default UploadArticle = props => {
                     placeholderTextColor={theme.text_primary}
                     multiline={true}
                     numberOfLines={5}
+                    value={services}
+                    onChangeText={txt => setServices(txt)}
                   />
                   <View style={{flex: 1, paddingBottom: 20}}>
                     <Button
@@ -168,6 +212,7 @@ export default UploadArticle = props => {
                   <BtnContainer>
                     <EachBtn>
                       <ButtonStyled
+                        onPress={submitUploadDoctor}
                         color="green"
                         title="Post Article"
                         style={{

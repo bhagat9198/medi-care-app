@@ -7,7 +7,6 @@ import {
   Button,
   Dimensions,
   ScrollView,
-  View,
   TouchableNativeFeedback,
 } from 'react-native';
 
