@@ -34,7 +34,7 @@ function DrawerScreens(props) {
   const dispatch = useDispatch();
   return (
     <Drawer.Navigator
-      initialRouteName={DrawerDoctor.articlesDrawer}
+      initialRouteName={DrawerDoctor.dashboardDrawer}
       drawerContent={props => {
         return (
           <DrawerContentScrollView {...props}>
@@ -105,7 +105,7 @@ function DrawerScreens(props) {
           ),
         }}
       />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name={DrawerDoctor.accountDrawer}
         component={AccountStackScreen}
         options={{
@@ -118,7 +118,7 @@ function DrawerScreens(props) {
             />
           ),
         }}
-      />
+      /> */}
       <Drawer.Screen
         name={DrawerDoctor.consultsDrawer}
         component={ConsultsTabScreen}

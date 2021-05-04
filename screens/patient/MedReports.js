@@ -3,7 +3,6 @@
 import React, {useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import styled, {ThemeProvider} from 'styled-components';
-import email from 'react-native-email';
 import Mailer from 'react-native-mail';
 import {
   Button,
@@ -14,86 +13,88 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import ImagePicker from 'react-native-image-crop-picker';
+
+import {addMedReport} from './../../store/actions/patient';
+import { DrawerPatient} from './../../constants/Navigation';
 
 export default function MedReports(props) {
   const [filePath, setFilePath] = useState(null);
   const [mimeType, setmimeType] = useState(null);
   const theme = useSelector(state => state.appReducer.colors);
+  const dispatch = useDispatch();
 
-  const [to, setTo] = useState(null);
-  const [bcc, setBcc] = useState(null);
-  const [ccc, setCcc] = useState(null);
-  const [subject, setSubject] = useState(null);
-  const [mailBody, setMailBody] = useState(null);
+  const [to, setTo] = useState('');
+  const [bcc, setBcc] = useState('');
+  const [ccc, setCcc] = useState('');
+  const [subject, setSubject] = useState('');
+  const [mailBody, setMailBody] = useState('');
 
-  // const handleEmail = () => {
-  //   const to = ['tiaan@email.com', 'foo@bar.com']; // string or array of email addresses
-  //   email(to, {
-  //     // Optional additional arguments
-  //     cc: ['bazzy@moo.com', 'doooo@daaa.com'], // string or array of email addresses
-  //     bcc: 'mee@mee.com', // string or array of email addresses
-  //     subject: 'Show how to use',
-  //     body: 'Some body right here',
-  //   }).catch(console.error);
-  // };
+  const handleMailer = async () => {
+    if(!to || !subject || !mailBody) {
+      return Alert.alert('Empty Fields', 'To, Subject and MailBody cant be empty. Please type something and proceede.')
+    }
 
-  // const openGalleryHandler = () => {
-  //   ImagePicker.openPicker({
-  //     width: 300,
-  //     height: 300,
-  //   }).then(images => {
-  //     console.log(images);
-  //     console.log(images.path);
-  //     console.log(images.mime);
-  //     setFilePath(images.path);
-  //     setmimeType(images.mime);
-  //   });
-  // };
+    await Mailer.mail(
+      {
+        subject: subject,
+        recipients: [to],
+        ccRecipients: [ccc],
+        bccRecipients: [bcc],
+        body: mailBody,
+        isHTML: false,
 
-  // const handleMailer = () => {
-  //   console.log(Mailer);
-  //   console.log(filePath, mimeType);
-  //   Mailer.mail(
-  //     {
-  //       subject: 'need help',
-  //       recipients: ['support@example.com'],
-  //       ccRecipients: ['supportCC@example.com'],
-  //       bccRecipients: ['supportBCC@example.com'],
-  //       body: '<b>A Bold Body</b>',
-  //       isHTML: true,
-  //       attachments: [
-  //         {
-  //           // Specify either `path` or `uri` to indicate where to find the file data.
-  //           // The API used to create or locate the file will usually indicate which it returns.
-  //           // An absolute path will look like: /cacheDir/photos/some image.jpg
-  //           // A URI starts with a protocol and looks like: content://appname/cacheDir/photos/some%20image.jpg
-  //           // The absolute path of the file from which to read data.
-  //           path: filePath, // The uri of the file from which to read the data.
-  //           // Specify either `type` or `mimeType` to indicate the type of data.
-  //           type: 'png', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-  //         },
-  //       ],
-  //     },
-  //     (error, event) => {
-  //       Alert.alert(
-  //         error,
-  //         event,
-  //         [
-  //           {
-  //             text: 'Ok',
-  //             onPress: () => console.log('OK: Email Error Response'),
-  //           },
-  //           {
-  //             text: 'Cancel',
-  //             onPress: () => console.log('CANCEL: Email Error Response'),
-  //           },
-  //         ],
-  //         {cancelable: true},
-  //       );
-  //     },
-  //   );
-  // };
+        // attachments: [
+        //   {
+        //     // Specify either `path` or `uri` to indicate where to find the file data.
+        //     // The API used to create or locate the file will usually indicate which it returns.
+        //     // An absolute path will look like: /cacheDir/photos/some image.jpg
+        //     // A URI starts with a protocol and looks like: content://appname/cacheDir/photos/some%20image.jpg
+        //     // The absolute path of the file from which to read data.
+        //     // path: filePath, // The uri of the file from which to read the data.
+        //     // Specify either `type` or `mimeType` to indicate the type of data.
+        //     // type: 'png', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+        //   },
+        // ],
+      },
+      (error, event) => {
+        Alert.alert(
+          error,
+          event,
+          [
+            {
+              text: 'Ok',
+              onPress: () => console.log('OK: Email Error Response'),
+            },
+            {
+              text: 'Cancel',
+              onPress: () => console.log('CANCEL: Email Error Response'),
+            },
+          ],
+          {cancelable: true},
+        );
+      },
+
+    );
+
+    let medReportData = {
+      to,
+      bcc,
+      ccc,
+      subject,
+      mailBody,
+      created: new Date().valueOf(),
+    };
+
+    let res = await dispatch(addMedReport(medReportData));
+    console.log('res med', res);
+    if (res.status) {
+      console.log(true);
+      // return Alert.alert('Success', 'Your email is succesfully sent');
+      props.navigation.navigate(DrawerPatient.dashboardDrawer)
+    } else {
+      return Alert.alert(res.title, res.message);
+    }
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -105,11 +106,11 @@ export default function MedReports(props) {
                 paddingLeft: Dimensions.get('window').width * 0.02,
                 paddingRight: Dimensions.get('window').width * 0.02,
                 paddingBottom: Dimensions.get('window').height * 0.08,
-
               }}>
-              <InputCont style={{
-                marginBottom: Dimensions.get('window').height * 0.03,
-              }} >
+              <InputCont
+                style={{
+                  marginBottom: Dimensions.get('window').height * 0.03,
+                }}>
                 <InputLabel
                   style={{
                     paddingLeft: Dimensions.get('window').width * 0.02,
@@ -123,7 +124,7 @@ export default function MedReports(props) {
                   autoFocus={true}
                   blurOnSubmit={true}
                   keyboardType="email-address"
-                  onChangeText={(txt) => setTo(txt)}
+                  onChangeText={txt => setTo(txt)}
                   placeholder="Sender Email Address"
                   placeholderTextColor={theme.text_secondary}
                   style={{
@@ -133,9 +134,10 @@ export default function MedReports(props) {
                   value={to}
                 />
               </InputCont>
-              <InputCont style={{
-                marginBottom: Dimensions.get('window').height * 0.03,
-              }} >
+              <InputCont
+                style={{
+                  marginBottom: Dimensions.get('window').height * 0.03,
+                }}>
                 <InputLabel
                   style={{
                     paddingLeft: Dimensions.get('window').width * 0.02,
@@ -159,9 +161,10 @@ export default function MedReports(props) {
                   value={bcc}
                 />
               </InputCont>
-              <InputCont style={{
-                marginBottom: Dimensions.get('window').height * 0.03,
-              }} >
+              <InputCont
+                style={{
+                  marginBottom: Dimensions.get('window').height * 0.03,
+                }}>
                 <InputLabel
                   style={{
                     paddingLeft: Dimensions.get('window').width * 0.02,
@@ -185,9 +188,11 @@ export default function MedReports(props) {
                   value={ccc}
                 />
               </InputCont>
-              <InputCont style={{
-                marginBottom: Dimensions.get('window').height * 0.03,
-              }}  flexColoumn={true}>
+              <InputCont
+                style={{
+                  marginBottom: Dimensions.get('window').height * 0.03,
+                }}
+                flexColoumn={true}>
                 <InputLabel
                   style={{
                     paddingLeft: Dimensions.get('window').width * 0.02,
@@ -209,12 +214,14 @@ export default function MedReports(props) {
                   }}
                   value={subject}
                   multiline={true}
-                  numberOfLines={2} 
+                  numberOfLines={2}
                 />
               </InputCont>
-              <InputCont style={{
-                marginBottom: Dimensions.get('window').height * 0.03,
-              }}  flexColoumn={true}>
+              <InputCont
+                style={{
+                  marginBottom: Dimensions.get('window').height * 0.03,
+                }}
+                flexColoumn={true}>
                 <InputLabel
                   style={{
                     paddingLeft: Dimensions.get('window').width * 0.02,
@@ -240,14 +247,14 @@ export default function MedReports(props) {
                 />
               </InputCont>
 
-              <BtnContainer style={{
-                marginTop: Dimensions.get('window').height * 0.03,
-                marginBottom: Dimensions.get('window').height * 0.03,
-              }}>
-                <Button title="Send Mail" />
+              <BtnContainer
+                style={{
+                  marginTop: Dimensions.get('window').height * 0.03,
+                  marginBottom: Dimensions.get('window').height * 0.03,
+                }}>
+                <Button title="Send Mail" onPress={handleMailer} />
               </BtnContainer>
             </MainContainer>
-
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       </ScrollView>
@@ -272,7 +279,6 @@ const InputLabel = styled.View`
   justify-content: center;
 `;
 const InputCont = styled.View`
-
   flex-direction: ${props => (props.flexColoumn ? 'column' : 'row')};
 `;
 

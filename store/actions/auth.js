@@ -77,7 +77,7 @@ export const signupAction = data => {
           U_DATA.diseases = [];
           U_DATA.reminders = [];
           U_DATA.consults = [];
-          U_DATA.doctorsVisited = [];
+          U_DATA.medReports = [];
         }
 
         return db

@@ -4,9 +4,11 @@ import React from 'react';
 import {Dimensions, ScrollView} from 'react-native';
 import styled, {ThemeProvider} from 'styled-components';
 import {useSelector, useDispatch} from 'react-redux';
+import ConsultsSnapshot from './../../components/helpers/ConsultsSnapshot';
 
 export default function Consults() {
   const theme = useSelector(state => state.appReducer.colors);
+  const consultsStore = useSelector(state => state.consultsReducer);
 
   const eachConsultUI = () => {
     return (
@@ -66,10 +68,8 @@ export default function Consults() {
       <MainContainer>
         <ScrollView contentContainerStyle={{flexGrow: 1, alignItems: 'center'}}>
           <AllConsults style={{flex: 1}}>
-            {eachConsultUI()}
-            {eachConsultUI()}
-            {eachConsultUI()}
-            {eachConsultUI()}
+            {/* {consultsStore?.allConsults?.length } */}
+{eachConsultUI()}
           </AllConsults>
         </ScrollView>
       </MainContainer>

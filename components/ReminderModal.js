@@ -22,6 +22,7 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import styled, {ThemeProvider} from 'styled-components';
 import {useDispatch, useSelector} from 'react-redux';
 
+import PatientSnapshot from './helpers/PatientSnapshot';
 import {appColor} from '../constants/App';
 import {bookReminder} from './../store/actions/patient';
 
@@ -45,6 +46,7 @@ export default function ReminderModal(props) {
       title,
       description,
       type,
+      id: Math.random()
     };
     let res = await dispatch(bookReminder(data));
     console.log('res', res);
@@ -134,6 +136,7 @@ export default function ReminderModal(props) {
   return (
     <ThemeProvider theme={theme}>
       <View>
+        <PatientSnapshot />
         <SafeAreaView>
           <Modal visible={props.modalStatus} animationType="slide">
             <View style={{flex: 1, backgroundColor: appColor.dark.primary}}>

@@ -3,86 +3,249 @@
 import React, {useEffect} from 'react';
 import styled, {ThemeProvider} from 'styled-components';
 import {useSelector, useDispatch} from 'react-redux';
-import {Dimensions, ScrollView, TouchableNativeFeedback} from 'react-native';
+import {
+  Alert,
+  Dimensions,
+  ScrollView,
+  TouchableNativeFeedback,
+} from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import {StackPatient} from './../../constants/Navigation';
+import {extractPrecationAndDescription} from '../../store/actions/patient';
+import PatientSnapshot from './../../components/helpers/PatientSnapshot';
 
 export default Diseases = props => {
   const dispatch = useDispatch();
   const theme = useSelector(state => state.appReducer.colors);
+  const diseasesDatasetStore = useSelector(
+    state => state.diseasesDatasetReducer,
+  );
+  const authStore = useSelector(state => state.authReducer);
 
-  const eachDiseaseUI = () => {
-    return (
-      <EachDiseases
-        style={{
-          marginTop: Dimensions.get('window').height * 0.01,
-          marginBottom: Dimensions.get('window').height * 0.01,
-        }}>
-        <EachDiseasesMainCont style={{
-          marginTop: Dimensions.get('window').height * 0.01,
-          marginBottom: Dimensions.get('window').height * 0.01,
-        }}>
-          <LeftCont
+  useEffect(async () => {
+    let res1 = await dispatch(extractPrecationAndDescription());
+    if (res1.status) {
+    } else {
+      return Alert.alert(res1.title, res1.message);
+    }
+  }, []);
+
+  let months = [
+    'JAN',
+    'FEB',
+    'MAR',
+    'APR',
+    'MAY',
+    'JUN',
+    'JUL',
+    'AUG',
+    'SEP',
+    'OCT',
+    'NOV',
+    'DEC',
+  ];
+
+  const descriptionUI = diseasesListArr => {
+    return diseasesListArr.map(d => {
+      let filteredDescption = diseasesDatasetStore.diseasesDescription.filter(
+        dp => dp.Disease === d,
+      );
+      if (filteredDescption.length > 0) {
+        return (
+          <EachDiseaseDetail key={Math.random()}
             style={{
-              paddingLeft: Dimensions.get('window').width * 0.02,
-              paddingRight: Dimensions.get('window').width * 0.02,
+              marginBottom: Dimensions.get('window').height * 0.01,
             }}>
-            <DateCont>
-              <DateText>01</DateText>
-            </DateCont>
-            <MonthCont>
-              <MonthText>MAY</MonthText>
-            </MonthCont>
-          </LeftCont>
-          <MiddleCont
-            style={{
-              paddingLeft: Dimensions.get('window').width * 0.05,
-              paddingRight: Dimensions.get('window').width * 0.02,
-            }}>
-            <EachDiseasesHeadingSub>
-              <EachDiseasesHeadingSubText>
-                Disease analyed
-              </EachDiseasesHeadingSubText>
-            </EachDiseasesHeadingSub>
-            <EachDiseasesHeadingMain>
-              <EachDiseasesHeadingMainText>
-                Common Cold
-              </EachDiseasesHeadingMainText>
-            </EachDiseasesHeadingMain>
-          </MiddleCont>
-          <RightCont
-            style={{
-              paddingLeft: Dimensions.get('window').width * 0.02,
-              paddingRight: Dimensions.get('window').width * 0.02,
-            }}>
-            <AntDesign name="delete" size={35} color="red" />
-          </RightCont>
-        </EachDiseasesMainCont>
-        <EachDiseasesSubCont style={{
-          marginTop: Dimensions.get('window').height * 0.005,
-          marginBottom: Dimensions.get('window').height * 0.02,
-          paddingLeft: Dimensions.get('window').width * 0.02,
-          paddingRight: Dimensions.get('window').width * 0.02,
-        }}>
-          <EachDiseaseDetail style={{
-            marginBottom: Dimensions.get('window').height * 0.01,
-          }}>
-            <EachDiseaseLabel style={{
-              paddingRight: Dimensions.get('window').width * 0.03,
-            }}>
-              <EachDiseaseLabelText>Symptom 1</EachDiseaseLabelText>
+            <EachDiseaseLabel
+              style={{
+                paddingRight: Dimensions.get('window').width * 0.03,
+              }}>
+              <EachDiseaseLabelText>
+                About the disease : {filteredDescption[0].Disease}
+              </EachDiseaseLabelText>
             </EachDiseaseLabel>
             <EachDiseaseInfo>
-              <EachDiseaseInfoText>Body Pain</EachDiseaseInfoText>
+              <EachDiseaseInfoText>
+                {filteredDescption[0].Description}
+              </EachDiseaseInfoText>
             </EachDiseaseInfo>
           </EachDiseaseDetail>
-        </EachDiseasesSubCont>
-      </EachDiseases>
+        );
+      }
+    });
+  };
+
+  const precautionsUI = diseasesListArr => {
+    return diseasesListArr.map(d => {
+      let filteredPrecaution = diseasesDatasetStore.diseasesPrecaution.filter(
+        dp => dp.Disease === d,
+      );
+      if (filteredPrecaution.length > 0) {
+        return (
+          <EachDiseaseDetail key={Math.random()}
+            style={{
+              marginBottom: Dimensions.get('window').height * 0.01,
+            }}>
+            <EachDiseaseLabel
+              style={{
+                paddingRight: Dimensions.get('window').width * 0.03,
+              }}>
+              <EachDiseaseLabelText>
+                Precautions : {filteredPrecaution[0].Disease}
+              </EachDiseaseLabelText>
+            </EachDiseaseLabel>
+            <EachDiseaseInfo>
+              <EachDiseaseInfoText>
+                {filteredPrecaution[0].Precaution_1}
+              </EachDiseaseInfoText>
+              <EachDiseaseInfoText>
+                {filteredPrecaution[0].Precaution_2}
+              </EachDiseaseInfoText>
+              <EachDiseaseInfoText>
+                {filteredPrecaution[0].Precaution_3}
+              </EachDiseaseInfoText>
+              <EachDiseaseInfoText>
+                {filteredPrecaution[0].Precaution_4}
+              </EachDiseaseInfoText>
+            </EachDiseaseInfo>
+          </EachDiseaseDetail>
+        );
+      }
+    });
+  };
+
+  const eachDiseaseUI = () => {
+    return authStore.diseases.map(dis => {
+      let fullDate = new Date(dis.created)
+        .toISOString()
+        .split('T')[0]
+        .split('-');
+      let day = fullDate[fullDate.length - 1];
+      let month = months[new Date(dis.created).getMonth()];
+      let diseasesListArr = dis.diseases.map(d => d.Disease);
+      let diseasesList = diseasesListArr.toString();
+      let yourSymptoms = dis.yourSymptoms.toString();
+      let otherSymptoms = new Set();
+      dis.diseases.map(d => {
+        otherSymptoms.add(d.Symptom_1);
+        otherSymptoms.add(d.Symptom_2);
+        otherSymptoms.add(d.Symptom_3);
+        otherSymptoms.add(d.Symptom_4);
+        otherSymptoms.add(d.Symptom_5);
+      });
+      let otherSymptomsArr = Array.from(otherSymptoms).toString();
+
+      return (
+        <EachDiseases
+          key={dis.id}
+          style={{
+            marginTop: Dimensions.get('window').height * 0.01,
+            marginBottom: Dimensions.get('window').height * 0.01,
+          }}>
+          <EachDiseasesMainCont
+            style={{
+              marginTop: Dimensions.get('window').height * 0.01,
+              marginBottom: Dimensions.get('window').height * 0.01,
+            }}>
+            <LeftCont
+              style={{
+                paddingLeft: Dimensions.get('window').width * 0.02,
+                paddingRight: Dimensions.get('window').width * 0.02,
+              }}>
+              <DateCont>
+                <DateText>{day}</DateText>
+              </DateCont>
+              <MonthCont>
+                <MonthText>{month}</MonthText>
+              </MonthCont>
+            </LeftCont>
+            <MiddleCont
+              style={{
+                paddingLeft: Dimensions.get('window').width * 0.05,
+                paddingRight: Dimensions.get('window').width * 0.02,
+              }}>
+              <EachDiseasesHeadingSub>
+                <EachDiseasesHeadingSubText>
+                  Disease analyed
+                </EachDiseasesHeadingSubText>
+              </EachDiseasesHeadingSub>
+              <EachDiseasesHeadingMain>
+                <EachDiseasesHeadingMainText>
+                  {diseasesList}
+                </EachDiseasesHeadingMainText>
+              </EachDiseasesHeadingMain>
+            </MiddleCont>
+            <RightCont
+              style={{
+                paddingLeft: Dimensions.get('window').width * 0.02,
+                paddingRight: Dimensions.get('window').width * 0.02,
+              }}>
+
+              {/* <AntDesign name="delete" size={35} color="red" /> */}
+            </RightCont>
+          </EachDiseasesMainCont>
+          <EachDiseasesSubCont
+            style={{
+              marginTop: Dimensions.get('window').height * 0.005,
+              marginBottom: Dimensions.get('window').height * 0.02,
+              paddingLeft: Dimensions.get('window').width * 0.02,
+              paddingRight: Dimensions.get('window').width * 0.02,
+            }}>
+            <EachDiseaseDetail
+              style={{
+                marginBottom: Dimensions.get('window').height * 0.01,
+              }}>
+              <EachDiseaseLabel
+                style={{
+                  paddingRight: Dimensions.get('window').width * 0.03,
+                }}>
+                <EachDiseaseLabelText>
+                  Symptoms you mentioned
+                </EachDiseaseLabelText>
+              </EachDiseaseLabel>
+              <EachDiseaseInfo>
+                <EachDiseaseInfoText>{yourSymptoms}</EachDiseaseInfoText>
+              </EachDiseaseInfo>
+            </EachDiseaseDetail>
+            <EachDiseaseDetail
+              style={{
+                marginBottom: Dimensions.get('window').height * 0.01,
+              }}>
+              <EachDiseaseLabel
+                style={{
+                  paddingRight: Dimensions.get('window').width * 0.03,
+                }}>
+                <EachDiseaseLabelText>
+                  Other Symptoms related to these diseases
+                </EachDiseaseLabelText>
+              </EachDiseaseLabel>
+              <EachDiseaseInfo>
+                <EachDiseaseInfoText>{otherSymptomsArr}</EachDiseaseInfoText>
+              </EachDiseaseInfo>
+            </EachDiseaseDetail>
+            {precautionsUI(diseasesListArr)}
+            {descriptionUI(diseasesListArr)}
+          </EachDiseasesSubCont>
+        </EachDiseases>
+      );
+    });
+  };
+
+  const notAvalibaleUI = () => {
+    return (
+      <NotAvalibaleCont>
+        <NotAvalibaleText>
+          You havent made any consult with any doctor yet.
+        </NotAvalibaleText>
+      </NotAvalibaleCont>
     );
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <ScrollView
+        contentContainerStyle={{flexGrow: 1}}
+        nestedScrollEnabled={true}>
         <MainContainer>
           <AddDiseasesCont
             style={{
@@ -90,7 +253,10 @@ export default Diseases = props => {
               paddingBottom: Dimensions.get('window').height * 0.03,
             }}>
             <SubText>Not Well? Checkout your disease</SubText>
-            <TouchableNativeFeedback>
+            <TouchableNativeFeedback
+              onPress={() =>
+                props.navigation.navigate(StackPatient.diseaseAnalysis)
+              }>
               <HeadingTextCont
                 style={{
                   marginTop: Dimensions.get('window').height * 0.02,
@@ -104,21 +270,33 @@ export default Diseases = props => {
             </TouchableNativeFeedback>
           </AddDiseasesCont>
           <AllDiseasesCont>
-            <AllDiseasesHeading style={{
-              paddingTop: Dimensions.get('window').height * 0.01,
-              paddingBottom: Dimensions.get('window').height * 0.01,
-              paddingLeft: Dimensions.get('window').width * 0.05,
-            }}>
+            <AllDiseasesHeading
+              style={{
+                paddingTop: Dimensions.get('window').height * 0.01,
+                paddingBottom: Dimensions.get('window').height * 0.01,
+                paddingLeft: Dimensions.get('window').width * 0.05,
+              }}>
               <AllDiseasesHeadingText>YOUR DISEASES</AllDiseasesHeadingText>
             </AllDiseasesHeading>
-            {eachDiseaseUI()}
-            {eachDiseaseUI()}
+            {authStore?.diseases?.length > 0 ? eachDiseaseUI() : notAvalibaleUI()}
           </AllDiseasesCont>
+          <PatientSnapshot />
         </MainContainer>
       </ScrollView>
     </ThemeProvider>
   );
 };
+
+const NotAvalibaleText = styled.Text`
+  color: orange;
+  font-size: 20px;
+`;
+const NotAvalibaleCont = styled.View`
+  flex: 1;
+  height: 100px;
+  justify-content: center;
+  align-items: center;
+`;
 
 const HeadingTextCont = styled.View`
   background-color: red;
@@ -169,7 +347,7 @@ const EachDiseasesHeadingSubText = styled.Text`
 
 const EachDiseasesHeadingMainText = styled.Text`
   color: ${props => props.theme.text_primary};
-  font-size: 21px;
+  font-size: 19px;
 `;
 
 const EachDiseasesHeadingMain = styled.View``;
@@ -201,9 +379,7 @@ const EachDiseaseLabelText = styled.Text`
 
 const EachDiseaseLabel = styled.View``;
 const EachDiseaseInfo = styled.View``;
-const EachDiseaseDetail = styled.View`
-flex-direction: row;
-`;
+const EachDiseaseDetail = styled.View``;
 const EachDiseasesSubCont = styled.View``;
 const EachDiseases = styled.View`
   border-bottom-width: 1px;

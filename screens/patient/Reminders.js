@@ -7,13 +7,15 @@ import {
   TouchableNativeFeedback,
   Text,
   Dimensions,
+  Alert,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 import styled, {ThemeProvider} from 'styled-components';
 
 import {appColor} from '../../constants/App';
 import ReminderModal from '../../components/ReminderModal';
+import {deleteReminder} from './../../store/actions/patient';
 
 export default function Reminders(props) {
   const [modalDisplay, setModalDisplay] = useState(false);
@@ -22,43 +24,62 @@ export default function Reminders(props) {
   };
   const theme = useSelector(state => state.appReducer.colors);
   const authStore = useSelector(state => state.authReducer);
-
   const allReminders = authStore.reminders;
-  console.log(allReminders);
+  const dispatch = useDispatch();
+
+  const reminderDeleteHandler = async id => {
+    let res = await dispatch(deleteReminder(id));
+    if (res.status) {
+    } else {
+      return Alert.alert(res.title, res.message);
+    }
+  };
 
   const allRemindersUI = () => {
-    return (
-      <View style={{flex: 1, alignItems: 'center'}}>
-        <View style={[styles.eachReminder]}>
-          <View
-            style={{
-              width: Dimensions.get('window').width * 0.2,
-              display: 'flex',
-              alignItems: 'center',
-            }}>
-            <Text style={[styles.txt, styles.timeDisplay]}>09</Text>
-            <Text style={[styles.txt, styles.timeDisplay]}>30</Text>
-          </View>
+    return allReminders.map((rem, index) => {
+      return (
+        <View style={{flex: 1, alignItems: 'center'}} key={index}>
+          <View style={[styles.eachReminder]}>
+            <View
+              style={{
+                width: Dimensions.get('window').width * 0.2,
+                display: 'flex',
+                alignItems: 'center',
+              }}>
+              <Text style={[styles.txt, styles.timeDisplay]}>
+                {rem.time.hours}
+              </Text>
+              <Text style={[styles.txt, styles.timeDisplay]}>
+                {rem.time.minutes}
+              </Text>
+            </View>
 
-          <View style={{width: Dimensions.get('window').width * 0.6}}>
-            <Text style={[styles.txt, styles.reminderName]}>dnfguhiwer</Text>
+            <View style={{width: Dimensions.get('window').width * 0.6}}>
+              <Text style={[styles.txt, styles.reminderName]}>{rem.title}</Text>
 
-            <Text style={[styles.txt, styles.reminderDescription]}>
-              dnfguhi sjfbiou osdnvbo usd sadbivuobas sdfwds ufnsd b
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: Dimensions.get('window').width * 0.2,
-            }}>
-            <MaterialIcons name="delete-outline" size={35} color="red" />
+              <Text style={[styles.txt, styles.reminderDescription]}>
+                {rem.description}
+              </Text>
+              <Text style={[styles.txt, styles.remType]}>
+                {rem.type.once ? 'Once' : 'Daily'}
+              </Text>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: Dimensions.get('window').width * 0.2,
+              }}>
+              <TouchableNativeFeedback
+                onPress={() => reminderDeleteHandler(rem.id)}>
+                <MaterialIcons name="delete-outline" size={35} color="red" />
+              </TouchableNativeFeedback>
+            </View>
           </View>
         </View>
-      </View>
-    );
+      );
+    });
   };
 
   const notAvalibaleUI = () => {
@@ -98,7 +119,7 @@ export default function Reminders(props) {
                   ALL REMINDERS
                 </Text>
               </View>
-              {allReminders.length > 0 ? allRemindersUI() : notAvalibaleUI()}
+              {allReminders?.length > 0 ? allRemindersUI() : notAvalibaleUI()}
             </View>
           </ScrollView>
         </View>
@@ -189,5 +210,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '900',
   },
-  reminderDescription: {},
+  reminderDescription: {
+    fontSize: 18,
+  },
+  remType: {
+    color: 'orange',
+    fontSize: 15,
+  },
 });

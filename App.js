@@ -14,12 +14,14 @@ import authReducer from './store/reducers/auth';
 import appReducer from './store/reducers/app';
 import doctorReducer from './store/reducers/doctor';
 import consultsReducer from './store/reducers/consults';
+import diseasesDatasetReducer from './store/reducers/diseasesDataset';
 
 const rootReducer = combineReducers({
   authReducer: authReducer,
   appReducer: appReducer,
   doctorReducer: doctorReducer,
-  consultsReducer: consultsReducer
+  consultsReducer: consultsReducer,
+  diseasesDatasetReducer: diseasesDatasetReducer
 });
 
 const store = createStore(rootReducer, applyMiddleware(thunk));

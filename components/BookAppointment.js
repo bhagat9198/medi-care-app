@@ -74,6 +74,7 @@ export default function BookAppointment(props) {
       date: date.date,
       title: description,
     };
+    
     props.bookConsultHandler(data);
   };
 

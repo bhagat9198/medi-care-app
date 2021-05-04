@@ -59,6 +59,7 @@ export const StackPatient = {
   myDoctors: 'myDoctors',
   appointments: 'appointments',
   account: 'account',
+  diseaseAnalysis: 'diseaseAnalysis',
 };
 
 export const TabPatient = {

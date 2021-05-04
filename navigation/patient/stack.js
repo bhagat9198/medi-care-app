@@ -22,6 +22,7 @@ import MedReports from '../../screens/patient/MedReports';
 import OfflineConsults from '../../screens/patient/OfflineConsults';
 import OnlineConsults from '../../screens/patient/OnlineConsults';
 import Appointments from '../../screens/patient/Appointments';
+import DiseaseAnalysis from '../../screens/patient/DiseaseAnalysis';
 import Reminders from '../../screens/patient/Reminders';
 import Article from '../../screens/common/Article';
 
@@ -61,8 +62,39 @@ const drawerCommonStyles = props => {
 
 const Stack = createStackNavigator();
 
+const diseaseAnalysisScreen = () => {
+  return (
+    <Stack.Screen
+      name={StackPatient.diseaseAnalysis}
+      component={DiseaseAnalysis}
+      options={{
+        title: 'Disease Analysis',
+        headerRight: () => {
+          return (
+            <View style={{paddingRight: 15}}>
+              <Ionicons
+                name="ios-analytics-sharp"
+                size={24}
+                color={appColor.dark.text_secondary}
+              />
+            </View>
+          );
+        },
+      }}
+    />
+  );
+};
+
+export const DiseaseAnalysisStackScreen = props => {
+  return (
+    <Stack.Navigator screenOptions={() => drawerCommonStyles(props)}>
+      {diseaseAnalysisScreen()}
+    </Stack.Navigator>
+  );
+};
+
 const accountScreen = () => {
-  return(
+  return (
     <Stack.Screen
       name={StackPatient.account}
       component={Account}
@@ -72,17 +104,17 @@ const accountScreen = () => {
           return (
             <View style={{paddingRight: 15}}>
               <MaterialCommunityIcons
-                  name="account"
-                  size={24}
-                  color={appColor.dark.text_secondary}
-                />
+                name="account"
+                size={24}
+                color={appColor.dark.text_secondary}
+              />
             </View>
           );
         },
       }}
     />
   );
-}
+};
 
 export const AccountStackScreen = props => {
   return (
@@ -91,7 +123,6 @@ export const AccountStackScreen = props => {
     </Stack.Navigator>
   );
 };
-
 
 const appointmentsScreen = () => {
   return (
@@ -238,6 +269,7 @@ export const DiseasesStackScreen = props => {
   return (
     <Stack.Navigator screenOptions={() => drawerCommonStyles(props)}>
       {diseasesScreen()}
+      {diseaseAnalysisScreen()}
     </Stack.Navigator>
   );
 };
@@ -361,7 +393,6 @@ export const OfflineConsultsStackScreen = props => {
   );
 };
 
-
 const remindersScreen = () => {
   return (
     <Stack.Screen
@@ -396,10 +427,10 @@ export const RemindersStackScreen = props => {
 const MedReportsScreen = () => {
   return (
     <Stack.Screen
-      name={StackPatient.medReports}  
+      name={StackPatient.medReports}
       component={MedReports}
       options={{
-        title: 'My Medical Reports',
+        title: 'Send Medical Report',
         headerRight: () => {
           return (
             <View style={{paddingRight: 15}}>
@@ -453,6 +484,7 @@ export const DashboardStackScreen = props => {
   return (
     <Stack.Navigator screenOptions={() => drawerCommonStyles(props)}>
       {dashboardScreen()}
+
     </Stack.Navigator>
   );
 };

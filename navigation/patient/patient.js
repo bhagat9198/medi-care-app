@@ -37,7 +37,7 @@ function DrawerScreens(props) {
   const dispatch = useDispatch();
   return (
     <Drawer.Navigator
-      initialRouteName={DrawerPatient.remindersDrawer}
+      initialRouteName={DrawerPatient.appointmentsDrawer}
       drawerContent={props => {
         return (
           <DrawerContentScrollView {...props}>
@@ -170,7 +170,7 @@ function DrawerScreens(props) {
         name={DrawerPatient.medReportsDrawer}
         component={MedReportsStackScreen}
         options={{
-          title: 'My Med Reports',
+          title: 'Send Medical Report',
           drawerIcon: () => (
             <MaterialIcons
               name="notes"
@@ -194,7 +194,7 @@ function DrawerScreens(props) {
           ),
         }}
       />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name={DrawerPatient.accountDrawer}
         component={AccountStackScreen}
         options={{
@@ -207,7 +207,7 @@ function DrawerScreens(props) {
             />
           ),
         }}
-      />
+      /> */}
     </Drawer.Navigator>
   );
 }
