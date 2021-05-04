@@ -21,7 +21,7 @@ export default function onlineConsults(props) {
   }
 
   const bookAppointmentToggleHandler = () => {
-    console.log(bookAppointmentToggle);
+    // console.log(bookAppointmentToggle);
     setbookAppointmentToggle(!bookAppointmentToggle);
   }
 

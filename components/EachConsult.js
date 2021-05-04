@@ -2,15 +2,16 @@
 
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import {useDispatch, useSelector} from 'react-redux';
+import { useSelector} from 'react-redux';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import {Button, Dimensions, TouchableWithoutFeedback} from 'react-native';
 import {StackPatient} from '../constants/Navigation';
 
+
 export default function EachConsult(props) {
-  const theme = useSelector(state => state.appReducer.colors);
-  console.log('lol',props);
+  // console.log('EachConsult');
+
   return (
     <EachConsultCont
       style={{
@@ -19,7 +20,7 @@ export default function EachConsult(props) {
         paddingTop: Dimensions.get('window').height * 0.01,
       }}>
       <TouchableWithoutFeedback onPress={() => {
-        console.log(props.navigation);
+        // console.log(props.navigation);
         return props.navigation.navigate( StackPatient.doctor, {data: 'lol'})
       }}>
         <ConsultDetailCont>
@@ -38,11 +39,11 @@ export default function EachConsult(props) {
               paddingBottom: Dimensions.get('window').height * 0.01,
             }}>
             <MainHeading>
-              <MainHeadingText>DR. ABCD</MainHeadingText>
+              <MainHeadingText>{`${props.consultData.initailName} ${props.consultData.fName} ${props.consultData.lName}`}</MainHeadingText>
             </MainHeading>
             <WorkAtText>
               Work at
-              <HospitalNameText> lol</HospitalNameText>
+              <HospitalNameText> {props.consultData.hospitalName}</HospitalNameText>
             </WorkAtText>
           </MiddleCont>
           <RightCont
@@ -57,13 +58,21 @@ export default function EachConsult(props) {
                 }}>
                 <FontAwesome name="rupee" size={32} color="red" />
               </IconCont>
-              <PriceText>500</PriceText>
+              <PriceText>{props.consultData.fee}</PriceText>
             </IconPriceCont>
           </RightCont>
         </ConsultDetailCont>
       </TouchableWithoutFeedback>
       <BookCont>
-        <Button title="Book Appointment" color="green" onPress={props.modalHandler} />
+        <Button title="Book Appointment" color="green" onPress={() => props.modalHandler({
+          docId: props.consultData.docId,
+          fee: props.consultData.fee,
+          doctorName: {
+            initial: props.consultData.initailName,
+            fName: props.consultData.fName,
+            lName: props.consultData.lName,
+          }
+        })} />
       </BookCont>
     </EachConsultCont>
   );

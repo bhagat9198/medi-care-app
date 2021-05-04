@@ -47,17 +47,17 @@ export default function SignupModal(props) {
   const dispatch = useDispatch();
 
   const registerUser = async () => {
-    console.log(
-      fName,
-      lName,
-      email,
-      password,
-      cPassword,
-      gender,
-      phone,
-      age,
-      userType,
-    );
+    // console.log(
+    //   fName,
+    //   lName,
+    //   email,
+    //   password,
+    //   cPassword,
+    //   gender,
+    //   phone,
+    //   age,
+    //   userType,
+    // );
     if (password !== cPassword) {
       return Alert.alert('Opps!!!', "Password's didnt match");
     }
@@ -101,10 +101,11 @@ export default function SignupModal(props) {
       phone,
       age,
       userType,
+      hospital: false,
     };
     Keyboard.dismiss();
     let result = await dispatch(signupAction(signupData));
-    console.log('result signup', result);
+    // console.log('result signup', result);
 
       if (!result.userStatus) {
         props.setErrorHandler(result.message);
@@ -174,8 +175,8 @@ export default function SignupModal(props) {
                 value="Select Gender"
                 enabled={false}
               />
-              <Picker.Item label="Male" value="male" />
-              <Picker.Item label="Female" value="female" />
+              <Picker.Item label="Male" value="Male" />
+              <Picker.Item label="Female" value="Female" />
             </Picker>
             <Picker
               selectedValue={userType}

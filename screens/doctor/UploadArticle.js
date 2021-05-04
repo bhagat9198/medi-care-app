@@ -5,7 +5,6 @@ import styled, {ThemeProvider} from 'styled-components';
 import ImagePicker from 'react-native-image-crop-picker';
 import Feather from 'react-native-vector-icons/Feather';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-
 import {useSelector, useDispatch} from 'react-redux';
 import {
   Image,
@@ -16,26 +15,35 @@ import {
   TouchableWithoutFeedback,
   View,
   Dimensions,
-  StyleSheet,
+  Alert,
 } from 'react-native';
+
+import {uploadArticle} from './../../store/actions/doctor';
+import {TabDoctor} from './../../constants/Navigation';
 
 export default UploadArticle = props => {
   const theme = useSelector(state => state.appReducer.colors);
   const [topImg, setTopImg] = useState(null);
   const [middleImg, setMiddleImg] = useState(null);
   const [lastImg, setLastImg] = useState(null);
+  const [title, setTitle] = useState('');
+  const [firstPara, setFirstPara] = useState('');
+  const [lastPara, setLastPara] = useState('');
+  const [articlesImgs, setArticlesImgs] = useState(false);
+  const dispatch = useDispatch();
 
-  console.log(topImg);
-
-  const updateState = (imgOrder, imgPath) => {
+  const updateState = (imgOrder, img) => {
     if (imgOrder === 'top') {
-      setTopImg(imgPath);
+      setTopImg(img);
     }
     if (imgOrder === 'middle') {
-      setMiddleImg(imgPath);
+      setMiddleImg(img);
     }
     if (imgOrder === 'last') {
-      setLastImg(imgPath);
+      setLastImg(img);
+    }
+    if (!articlesImgs) {
+      setArticlesImgs(true);
     }
   };
 
@@ -45,8 +53,7 @@ export default UploadArticle = props => {
       height: 300,
       cropping: true,
     }).then(image => {
-      console.log(image);
-      updateState(imgOrder, image.path);
+      updateState(imgOrder, image);
     });
   };
 
@@ -56,8 +63,7 @@ export default UploadArticle = props => {
       height: 300,
       cropping: true,
     }).then(image => {
-      console.log(image);
-      updateState(imgOrder, image.path);
+      updateState(imgOrder, image);
     });
   };
 
@@ -69,7 +75,7 @@ export default UploadArticle = props => {
           <MediaBtnHolder>
             <TouchableNativeFeedback
               style={{flex: 1}}
-              onPress={() => openCameraHandler('top')}>
+              onPress={() => openCameraHandler(mediaBtnType)}>
               <MediaBtn
                 style={{
                   padding: Dimensions.get('window').width * 0.03,
@@ -109,13 +115,13 @@ export default UploadArticle = props => {
   const ImgPreviewUI = imgOrder => {
     let path;
     if (imgOrder === 'top') {
-      path = topImg;
+      path = topImg.path;
     }
     if (imgOrder === 'middle') {
-      path = middleImg;
+      path = middleImg.path;
     }
     if (imgOrder === 'last') {
-      path = lastImg;
+      path = lastImg.path;
     }
     return (
       <FilePreview
@@ -127,6 +133,57 @@ export default UploadArticle = props => {
         />
       </FilePreview>
     );
+  };
+  const submitArticle = async() => {
+    if (!title || !firstPara || !lastPara) {
+      return Alert.alert(
+        'Incomplete Fields',
+        'In order to upload an article, please fill all the fields i.e, title, first and last paragraph',
+      );
+    }
+
+    // if (!articlesImgs) {
+    //   console.log('lol why', articlesImgs);
+    //   Alert.alert(
+    //     'Warrning',
+    //     'You have not added any image to your articles. Readers may not find interesting. Want to proceed without any image?',
+    //     [
+    //       {text: 'Cancel', onPress: () => {console.log('clicked');}},
+    //       {
+    //         text: 'Confirm',
+    //         onPress: () => {
+    //           console.log('cccc');
+    //           setArticlesImgs(true)
+    //         },
+    //       },
+    //     ],
+    //   );
+    // }
+
+    const articledata = {
+      title,
+      firstPara,
+      lastPara,
+    };
+
+    if (topImg) {
+      articledata.topImg = topImg;
+    }
+    if (middleImg) {
+      articledata.middleImg = middleImg;
+    }
+    if (lastImg) {
+      articledata.lastImg = lastImg;
+    }
+
+    let res = await dispatch(uploadArticle(articledata));
+    // console.log('res', res);
+    if(res.status) {
+      Alert.alert(res.title, res.message)
+      props.navigation.navigate(`${TabDoctor.allArticlesTab}`);
+    } else {
+      Alert.alert(res.title, res.message);
+    }
   };
 
   return (
@@ -148,6 +205,8 @@ export default UploadArticle = props => {
                     placeholder="Title"
                     placeholderTextColor={theme.text_primary}
                     style={{borderRadius: 50}}
+                    value={title}
+                    onChangeText={txt => setTitle(txt)}
                   />
                   {mediaBtnUI('top')}
                   {topImg ? ImgPreviewUI('top') : null}
@@ -156,6 +215,8 @@ export default UploadArticle = props => {
                     placeholderTextColor={theme.text_primary}
                     multiline={true}
                     numberOfLines={5}
+                    value={firstPara}
+                    onChangeText={txt => setFirstPara(txt)}
                   />
                   {mediaBtnUI('middle')}
                   {middleImg ? ImgPreviewUI('middle') : null}
@@ -164,6 +225,8 @@ export default UploadArticle = props => {
                     placeholderTextColor={theme.text_primary}
                     multiline={true}
                     numberOfLines={5}
+                    value={lastPara}
+                    onChangeText={txt => setLastPara(txt)}
                   />
                   {mediaBtnUI('last')}
                   {lastImg ? ImgPreviewUI('last') : null}
@@ -175,6 +238,7 @@ export default UploadArticle = props => {
                       <ButtonStyled
                         color="green"
                         title="Post Article"
+                        onPress={submitArticle}
                         style={{
                           marginBottom: Dimensions.get('window').height * 0.05,
                         }}
@@ -197,7 +261,7 @@ const ButtonStyled = styled.Button`
 
 const EachBtn = styled.View`
   width: 50%;
-  padding-bottom: 10px
+  padding-bottom: 10px;
 `;
 const BtnContainer = styled.View`
   flex: 1;
@@ -222,13 +286,13 @@ const MediaBtn = styled.View`
 
 const SubText = styled.Text`
   color: ${props => props.theme.text_secondary};
-  font-size: 17;
-  margin-bottom: ${() => Dimensions.get('window').height * 0.03};
+  font-size: 17px;
+  margin-bottom: ${() => Dimensions.get('window').height * 0.03}px;
 `;
 
 const FilePreview = styled.View`
   flex: 1;
-  height: 300;
+  height: 300px;
   width: 100%;
   align-items: center;
 `;
@@ -251,8 +315,8 @@ const TextInput = styled.TextInput`
   font-size: 20px;
   width: 100%;
   background-color: ${props => props.theme.secondary};
-  padding-left: 20;
-  margin-bottom: ${() => Dimensions.get('window').height * 0.05};
+  padding-left: 20px;
+  margin-bottom: ${() => Dimensions.get('window').height * 0.05}px;
 `;
 
 const Text = styled.Text`
@@ -264,5 +328,3 @@ const MainContainer = styled.View`
   padding-top: 20px;
   flex: 1;
 `;
-
-const styles = StyleSheet.create({});

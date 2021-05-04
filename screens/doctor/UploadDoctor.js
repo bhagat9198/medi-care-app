@@ -17,8 +17,9 @@ import {
 } from 'react-native';
 
 import {uploadDoctor} from './../../store/actions/doctor';
- 
-export default UploadArticle = props => {
+import {TabDoctor} from './../../constants/Navigation';
+
+export default UploadArticle = (props) => {
   const theme = useSelector(state => state.appReducer.colors);
   const [imgs, setImgs] = useState([]);
   const [uploadImgs, setUploadImgs] = useState(false);
@@ -35,7 +36,6 @@ export default UploadArticle = props => {
       }
       let [lat, long] = m[0].split(',');
       lat = lat.split('@')[1];
-      console.log(lat, long, 'aaaa');
       return [lat, long];
     }
   };
@@ -47,18 +47,19 @@ export default UploadArticle = props => {
       cropping: true,
       multiple: true,
     }).then(images => {
-      console.log(images);
       setImgs(prevImages => {
         return [...prevImages, ...images];
       });
+      if(!uploadImgs) {
+        setUploadImgs(true);
+      }
     });
   };
 
   const ImgPreviewUI = () => {
     if (!imgs) return;
-    console.log(imgs);
-    return imgs.map(img => (
-      <FilePreview
+    return imgs.map((img, index) => (
+      <FilePreview key={Math.random()}
         style={{
           width: Dimensions.get('window').width * 0.44,
           height: Dimensions.get('window').width * 0.44,
@@ -81,43 +82,61 @@ export default UploadArticle = props => {
   const [locationUrl, setLocationUrl] = useState('');
   const [about, setAbout] = useState('');
   const [services, setServices] = useState('');
+  const [appointmentFee, setAppointmentFee] = useState('');
 
   const submitUploadDoctor = async() => {
-    // if(!name || !specializations || !location || !locationUrl || !about || !services) {
-    //   return Alert.alert('Incomplete Form', 'Please fill all the details in order to upload yourslef');
-    // }
+    if(!name || !specializations || !location || !locationUrl || !about || !services) {
+      return Alert.alert('Incomplete Form', 'Please fill all the details in order to upload yourslef');
+    }
     let lat, long;
-    
+    try {
+      [lat, long] = getLatLon();
+    } catch (error) {
+      return Alert.alert(
+        'Invalid URL',
+        'Please copy the correct URL from address bar of browser.',
+      );
+    }
 
-    // if(!uploadImgs) {
-    //   console.log('hey');
-    //   return Alert.alert(
+    // if (!uploadImgs) {
+    //   Alert.alert(
     //     'No Images',
     //     'Are you sure you want to proceed without any images?',
     //     [
     //       {text: 'Cancel', onPress: () => console.log('Cancel Pressed!')},
-    //       {text: 'Confirm', onPress: () => setUploadImgs(true)},
+    //       {
+    //         text: 'Confirm',
+    //         onPress: () => {
+    //           setUploadImgs(true), submitUploadDoctor();
+    //         },
+    //       },
     //     ],
-        
-    //   );
-    // }  
-
-    
-
-    // try {
-    //   [lat, long] = getLatLon();
-    // } catch (error) {
-    //   return Alert.alert(
-    //     'Invalid URL',
-    //     'Please copy the correct URL from address bar of browser.',
     //   );
     // }
 
+    let allSpecializations = specializations.split(',');
+    let allServices = services.split(',');
+
     let wholeData = {
-      imgs
+      name,
+      specializations: allSpecializations,
+      location,
+      locationUrl: [lat, long],
+      about,
+      services: allServices,
+      imgs: [],
+      fee: appointmentFee
+    };
+    if (imgs.length > 0) {
+      wholeData.imgs = imgs;
     }
+
     let res = await dispatch(uploadDoctor(wholeData));
-    console.log(res);
+    
+    Alert.alert(res.title, res.message);
+    if(res.status) {
+      return props.navigation.navigate(`${TabDoctor.doctorsTab}`);
+    }
   };
 
   return (
@@ -150,23 +169,34 @@ export default UploadArticle = props => {
                       marginBottom: Dimensions.get('window').height * 0.05,
                       borderRadius: 50,
                     }}
-                    placeholder="Specializations (seprate with comma ' , ' )"
+                    placeholder="Location"
                     placeholderTextColor={theme.text_primary}
-                    multiline={true}
-                    numberOfLines={2}
-                    value={specializations}
-                    onChangeText={txt => setSpecializations(txt)}
+                    value={location}
+                    onChangeText={txt => setLocation(txt)}
                   />
                   <TextInput
                     style={{
                       marginBottom: Dimensions.get('window').height * 0.05,
                       borderRadius: 50,
                     }}
-                    placeholder="Location"
+                    placeholder="Consult Fee"
+                    keyboardType='number-pad'
                     placeholderTextColor={theme.text_primary}
-                    value={location}
-                    onChangeText={txt => setLocation(txt)}
+                    value={appointmentFee}
+                    onChangeText={txt => setAppointmentFee(txt)}
                   />
+                  <TextInput
+                    style={{
+                      marginBottom: Dimensions.get('window').height * 0.05,
+                    }}
+                    placeholder="Specializations/Specialist In (seprate with comma ' , ' )"
+                    placeholderTextColor={theme.text_primary}
+                    multiline={true}
+                    numberOfLines={3}
+                    value={specializations}
+                    onChangeText={txt => setSpecializations(txt)}
+                  />
+
                   <TextInput
                     style={{
                       marginBottom: Dimensions.get('window').height * 0.05,

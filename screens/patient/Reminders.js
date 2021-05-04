@@ -6,83 +6,121 @@ import {
   ScrollView,
   TouchableNativeFeedback,
   Text,
-  Platform,
   Dimensions,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useSelector} from 'react-redux';
+import styled, {ThemeProvider} from 'styled-components';
 
 import {appColor} from '../../constants/App';
-import ReminderMOdal from '../../components/ReminderModal';
+import ReminderModal from '../../components/ReminderModal';
 
-export default function Reminders() {
+export default function Reminders(props) {
   const [modalDisplay, setModalDisplay] = useState(false);
   const modalStatusHandler = () => {
     setModalDisplay(!modalDisplay);
-  }
+  };
+  const theme = useSelector(state => state.appReducer.colors);
+  const authStore = useSelector(state => state.authReducer);
 
-  return (
-    <View style={styles.mainContainer}>
-      <View style={styles.touchNativeCont}>
-        <TouchableNativeFeedback onPress={() => setModalDisplay(!modalDisplay)}>
-          <View style={styles.addReminderCont}>
-            <MaterialIcons
-              name="alarm-add"
-              size={35}
-              color={appColor.dark.text_primary}
-              style={{marginRight: 20}}
-            />
-            <Text style={[styles.txt, styles.addReminderTxt]}>
-              Add Reminder
+  const allReminders = authStore.reminders;
+  console.log(allReminders);
+
+  const allRemindersUI = () => {
+    return (
+      <View style={{flex: 1, alignItems: 'center'}}>
+        <View style={[styles.eachReminder]}>
+          <View
+            style={{
+              width: Dimensions.get('window').width * 0.2,
+              display: 'flex',
+              alignItems: 'center',
+            }}>
+            <Text style={[styles.txt, styles.timeDisplay]}>09</Text>
+            <Text style={[styles.txt, styles.timeDisplay]}>30</Text>
+          </View>
+
+          <View style={{width: Dimensions.get('window').width * 0.6}}>
+            <Text style={[styles.txt, styles.reminderName]}>dnfguhiwer</Text>
+
+            <Text style={[styles.txt, styles.reminderDescription]}>
+              dnfguhi sjfbiou osdnvbo usd sadbivuobas sdfwds ufnsd b
             </Text>
           </View>
-        </TouchableNativeFeedback>
-      </View>
-      <View style={styles.reminderListCont}>
-        <ScrollView>
-          <View>
-            <View style={styles.allRemindHeadingCont}>
-              <Text style={[styles.txt, styles.txtHeading]}>ALL REMINDERS</Text>
-            </View>
-            <View style={{flex: 1, alignItems: 'center'}}>
-              <View style={[styles.eachReminder]}>
-                <View
-                  style={{
-                    width: Dimensions.get('window').width * 0.2,
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}>
-                  <Text style={[styles.txt, styles.timeDisplay]}>09</Text>
-                  <Text style={[styles.txt, styles.timeDisplay]}>30</Text>
-                </View>
-
-                <View style={{width: Dimensions.get('window').width * 0.6}}>
-                  <Text style={[styles.txt, styles.reminderName]}>
-                    dnfguhiwer
-                  </Text>
-
-                  <Text style={[styles.txt, styles.reminderDescription]}>
-                    dnfguhi sjfbiou osdnvbo usd sadbivuobas sdfwds ufnsd b
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: Dimensions.get('window').width * 0.2,
-                  }}>
-                  <MaterialIcons name="delete-outline" size={35} color="red" />
-                </View>
-              </View>
-            </View>
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: Dimensions.get('window').width * 0.2,
+            }}>
+            <MaterialIcons name="delete-outline" size={35} color="red" />
           </View>
-        </ScrollView>
+        </View>
       </View>
-      <ReminderMOdal modalStatus={modalDisplay} onclick={modalStatusHandler} />
-    </View>
+    );
+  };
+
+  const notAvalibaleUI = () => {
+    return (
+      <NotAvalibaleCont>
+        <NotAvalibaleText>
+          You have not added any remindes yet.
+        </NotAvalibaleText>
+      </NotAvalibaleCont>
+    );
+  };
+
+  return (
+    <ThemeProvider theme={theme}>
+      <View style={styles.mainContainer}>
+        <View style={styles.touchNativeCont}>
+          <TouchableNativeFeedback
+            onPress={() => setModalDisplay(!modalDisplay)}>
+            <View style={styles.addReminderCont}>
+              <MaterialIcons
+                name="alarm-add"
+                size={35}
+                color={appColor.dark.text_primary}
+                style={{marginRight: 20}}
+              />
+              <Text style={[styles.txt, styles.addReminderTxt]}>
+                Add Reminder
+              </Text>
+            </View>
+          </TouchableNativeFeedback>
+        </View>
+        <View style={styles.reminderListCont}>
+          <ScrollView>
+            <View>
+              <View style={styles.allRemindHeadingCont}>
+                <Text style={[styles.txt, styles.txtHeading]}>
+                  ALL REMINDERS
+                </Text>
+              </View>
+              {allReminders.length > 0 ? allRemindersUI() : notAvalibaleUI()}
+            </View>
+          </ScrollView>
+        </View>
+        <ReminderModal
+          modalStatus={modalDisplay}
+          onclick={modalStatusHandler}
+        />
+      </View>
+    </ThemeProvider>
   );
 }
+
+const NotAvalibaleText = styled.Text`
+  font-size: 20px;
+  color: red;
+`;
+
+const NotAvalibaleCont = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
 
 const styles = StyleSheet.create({
   mainContainer: {

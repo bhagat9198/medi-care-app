@@ -2,6 +2,7 @@
 
 import React, {useState, useEffect} from 'react';
 import {
+  Alert,
   Dimensions,
   KeyboardAvoidingView,
   ScrollView,
@@ -9,14 +10,12 @@ import {
   TouchableNativeFeedback,
   TouchableOpacity,
 } from 'react-native';
-import styled, {ThemeProvider} from 'styled-components';
-import {useDispatch, useSelector} from 'react-redux';
+import styled from 'styled-components';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default function BookAppointment(props) {
-  const theme = useSelector(state => state.appReducer.colors);
   const [time, setTime] = useState({
     time: 0,
     status: false,
@@ -41,7 +40,7 @@ export default function BookAppointment(props) {
   }, []);
 
   const toggleDateHandler = () => {
-    console.log('date');
+    // console.log('date');
     setDate(prevState => ({
       ...prevState,
       status: !prevState.status,
@@ -49,11 +48,33 @@ export default function BookAppointment(props) {
   };
 
   const toggleTimeHandler = () => {
-    console.log('time');
+    // console.log('time');
     setTime(prevState => ({
       ...prevState,
       status: !prevState.status,
     }));
+  };
+
+  const submitHandler = () => {
+    if (!description) {
+      return Alert.alert(
+        'Empty Field',
+        'Please enter the reason in brief on why you want to consult the doctor.',
+      );
+    }
+
+    if (time == 0 || data == 0) {
+      return Alert.alert(
+        'Empty Field',
+        'Please mention the date and time when you want to consult the doctor.',
+      );
+    }
+    let data = {
+      time: time.time,
+      date: date.date,
+      title: description,
+    };
+    props.bookConsultHandler(data);
   };
 
   const dateUI = () => {
@@ -74,15 +95,22 @@ export default function BookAppointment(props) {
                 mode="date"
                 display="default"
                 onChange={dateChange => {
-                  console.log('dateChange', dateChange);
+                  // console.log('dateChange', dateChange);
                   if (dateChange.type === 'dismissed') {
                     toggleDateHandler();
                   }
-                  if (timeChange.type === 'set') {
-                    setTime(prevTime => ({
-                      ...prevTime,
-                      time: timeChange.timestamp,
+                  if (dateChange.type === 'set') {
+                    // let dateStr = new Date(dateChange.timestamp).toISOString();
+                    // console.log('dateStr', dateChange.nativeEvent.timestamp);
+                    let dateStr = dateChange.nativeEvent.timestamp
+                      .toISOString()
+                      .split('T')[0];
+                    // console.log(dateStr);
+                    setDate(prevDate => ({
+                      ...prevDate,
+                      date: dateChange.nativeEvent.timestamp,
                       status: false,
+                      txt: dateStr,
                     }));
                   }
                 }}
@@ -115,16 +143,24 @@ export default function BookAppointment(props) {
                 mode="time"
                 display="clock"
                 minuteInterval={1}
+                is24Hour={true}
                 onChange={timeChange => {
-                  console.log('timeChange', timeChange);
+                  // console.log('timeChange', timeChange);
                   if (timeChange.type === 'dismissed') {
                     toggleTimeHandler();
                   }
                   if (timeChange.type === 'set') {
+                    // console.log(timeChange.nativeEvent.timestamp);
+                    let timeStr = timeChange.nativeEvent.timestamp
+                      .toISOString()
+                      .split('T')[1]
+                      .split('.')[0];
+
                     setTime(prevTime => ({
                       ...prevTime,
-                      time: timeChange.timestamp,
+                      time: timeChange.nativeEvent.timestamp,
                       status: false,
+                      txt: timeStr,
                     }));
                   }
                 }}
@@ -151,48 +187,53 @@ export default function BookAppointment(props) {
       animationType="fade"
       visible={props.modalStatus}
       onRequestClose={props.modalStatusHandler}>
-        <TouchableOpacity style={{flex: 1}} onPress={() => {console.log('clcickd'); return props.modalStatusHandler()}}>
-      <ScrollView contentContainerStyle={{flexGrow: 1}}>
-        <KeyboardAvoidingView
-          style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <MainContainer
-            style={{
-              paddingTop: Dimensions.get('window').height * 0.02,
-              paddingBottom: Dimensions.get('window').height * 0.02,
-              paddingLeft: Dimensions.get('window').width * 0.05,
-              paddingRight: Dimensions.get('window').width * 0.05,
-            }}>
-            <DateTimeCont>
-              {dateUI()}
-              {timeUI()}
-              <TextInputStyledCont>
-                <TextInputStyled
-                  value={description}
-                  placeholder="Reason for appointment in brief"
-                  placeholderTextColor={props.theme.text_primary}
-                  multiline={true}
-                  onChangeText={t => setDescription(t)}
-                  style={{
-                    marginBottom: Dimensions.get('window').height * 0.05,
-                    marginTop: Dimensions.get('window').height * 0.02,
-                  }}
-                />
-              </TextInputStyledCont>
-            </DateTimeCont>
-            <BtnCont
+      <TouchableOpacity
+        style={{flex: 1}}
+        onPress={() => {
+          return props.modalStatusHandler();
+        }}>
+        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+          <KeyboardAvoidingView
+            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <MainContainer
               style={{
-                paddingTop: Dimensions.get('window').height * 0.01,
-                paddingBottom: Dimensions.get('window').height * 0.01,
+                paddingTop: Dimensions.get('window').height * 0.02,
+                paddingBottom: Dimensions.get('window').height * 0.02,
+                paddingLeft: Dimensions.get('window').width * 0.05,
+                paddingRight: Dimensions.get('window').width * 0.05,
               }}>
-              <TouchableNativeFeedback>
-                <BtnText>
-                  PAY <FontAwesome name="rupee" size={20} /> 456
-                </BtnText>
-              </TouchableNativeFeedback>
-            </BtnCont>
-          </MainContainer>
-        </KeyboardAvoidingView>
-      </ScrollView>
+              <DateTimeCont>
+                {dateUI()}
+                {timeUI()}
+                <TextInputStyledCont>
+                  <TextInputStyled
+                    value={description}
+                    placeholder="Reason for appointment in brief"
+                    placeholderTextColor={props.theme.text_primary}
+                    multiline={true}
+                    onChangeText={t => setDescription(t)}
+                    style={{
+                      marginBottom: Dimensions.get('window').height * 0.05,
+                      marginTop: Dimensions.get('window').height * 0.02,
+                    }}
+                  />
+                </TextInputStyledCont>
+              </DateTimeCont>
+              <BtnCont
+                style={{
+                  paddingTop: Dimensions.get('window').height * 0.01,
+                  paddingBottom: Dimensions.get('window').height * 0.01,
+                }}>
+                <TouchableNativeFeedback onPress={submitHandler}>
+                  <BtnText>
+                    PAY <FontAwesome name="rupee" size={20} />{' '}
+                    {props.consultData.fee}
+                  </BtnText>
+                </TouchableNativeFeedback>
+              </BtnCont>
+            </MainContainer>
+          </KeyboardAvoidingView>
+        </ScrollView>
       </TouchableOpacity>
     </ModalStyled>
   );
@@ -213,13 +254,13 @@ const BtnCont = styled.View`
 
 const DateTimeText = styled.Text`
   color: ${props => props.theme.text_primary};
-  font-size: 22;
+  font-size: 22px;
 `;
 
 const TextInputStyled = styled.TextInput`
   color: ${props => props.theme.text_primary};
   font-size: 20px;
-  border-bottom-color:  ${props => props.theme.text_secondary};
+  border-bottom-color: ${props => props.theme.text_secondary};
   border-bottom-width: 1px;
 `;
 

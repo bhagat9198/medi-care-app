@@ -1,136 +1,188 @@
 /* eslint-disable */
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Dimensions, ScrollView} from 'react-native';
 import styled, {ThemeProvider} from 'styled-components';
 import {useDispatch, useSelector} from 'react-redux';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
+import {useFocusEffect} from '@react-navigation/native';
+import Snapshots from '../../components/helpers/DocSnapshot';
+import ConsultsSnapshot from '../../components/helpers/ConsultsSnapshot';
+
+import {exractAppointments} from './../../store/actions/patient';
 
 export default function Appointments() {
   const theme = useSelector(state => state.appReducer.colors);
+  const consultsStore = useSelector(state => state.consultsReducer);
+
   const [feeback, setFeedback] = useState(null);
+  const dispatch = useDispatch();
 
   const eachAppointmentUI = () => {
-    return (
-      <EachAppointment
-        style={{
-          marginBottom: Dimensions.get('window').height * 0.02,
-          marginTop: Dimensions.get('window').height * 0.02,
-          paddingBottom: Dimensions.get('window').height * 0.02,
-          paddingTop: Dimensions.get('window').height * 0.02,
-          paddingLeft: Dimensions.get('window').width * 0.02,
-          paddingRight: Dimensions.get('window').width * 0.02,
-          // height: Dimensions.get('window').height * 0.,
-        }}>
-        <AppointmentHeading
+    return consultsStore.allConsults.map((con, index) => {
+      let booked = new Date(con.booked).toISOString().split('T')[0];
+      let date = new Date(con.data.date).toISOString().split('T')[0];
+      let time = new Date(con.data.time.seconds * 1000)
+        .toISOString()
+        .split('T')[1]
+        .split('.')[0];
+      // let time = 12;
+      return (
+        <EachAppointment
+          key={index}
           style={{
-            paddingBottom: Dimensions.get('window').height * 0.01,
-            paddingTop: Dimensions.get('window').height * 0.01,
+            marginBottom: Dimensions.get('window').height * 0.02,
+            marginTop: Dimensions.get('window').height * 0.02,
+            paddingBottom: Dimensions.get('window').height * 0.02,
+            paddingTop: Dimensions.get('window').height * 0.02,
             paddingLeft: Dimensions.get('window').width * 0.02,
             paddingRight: Dimensions.get('window').width * 0.02,
           }}>
-          <DateCont>
-            <AppointmentHeadingText>22:14 </AppointmentHeadingText>
-          </DateCont>
-          <TimeCont>
-            <AppointmentHeadingSubText>SAT</AppointmentHeadingSubText>
-          </TimeCont>
-        </AppointmentHeading>
-        <AppointmentBody>
-          <ScrollView nestedScrollEnabled={true}>
-            <AppointmentDetail
-              style={{
-                marginTop: Dimensions.get('window').height * 0.01,
-                marginBottom: Dimensions.get('window').height * 0.01,
-              }}>
-              <AppointmentLabel>
-                <AppointmentLabelText>Description</AppointmentLabelText>
-              </AppointmentLabel>
-              <AppointmentInfo>
-                <AppointmentInfoText>
-                  Helloooooooooooooooooooooooooooooo
-                </AppointmentInfoText>
-              </AppointmentInfo>
-            </AppointmentDetail>
-            <AppointmentDetail
-              style={{
-                marginTop: Dimensions.get('window').height * 0.01,
-                marginBottom: Dimensions.get('window').height * 0.01,
-              }}>
-              <AppointmentLabel>
-                <AppointmentLabelText>
-                  Appointment Taken by
-                </AppointmentLabelText>
-              </AppointmentLabel>
-              <AppointmentInfo>
-                <AppointmentInfoText>Doc NAME</AppointmentInfoText>
-              </AppointmentInfo>
-            </AppointmentDetail>
-            <AppointmentDetail
-              style={{
-                marginTop: Dimensions.get('window').height * 0.01,
-                marginBottom: Dimensions.get('window').height * 0.01,
-              }}>
-              <AppointmentLabel>
-                <AppointmentLabelText>Appointment Fee</AppointmentLabelText>
-              </AppointmentLabel>
-              <AppointmentInfo direction='row'>
-
-                <FontAwesome
-                  name="rupee"
-                  size={24}
-                  color="red"
+          <AppointmentHeading
+            style={{
+              paddingBottom: Dimensions.get('window').height * 0.01,
+              paddingTop: Dimensions.get('window').height * 0.01,
+              paddingLeft: Dimensions.get('window').width * 0.02,
+              paddingRight: Dimensions.get('window').width * 0.02,
+            }}>
+            <DateCont>
+              <AppointmentHeadingText>{time}</AppointmentHeadingText>
+            </DateCont>
+            <TimeCont>
+              <AppointmentHeadingSubText>{date}</AppointmentHeadingSubText>
+            </TimeCont>
+          </AppointmentHeading>
+          <AppointmentBody>
+            <ScrollView nestedScrollEnabled={true}>
+              <AppointmentDetail
+                style={{
+                  marginTop: Dimensions.get('window').height * 0.01,
+                  marginBottom: Dimensions.get('window').height * 0.01,
+                }}>
+                <AppointmentLabel>
+                  <AppointmentLabelText>Description</AppointmentLabelText>
+                </AppointmentLabel>
+                <AppointmentInfo>
+                  <AppointmentInfoText>{con.data.title}</AppointmentInfoText>
+                </AppointmentInfo>
+              </AppointmentDetail>
+              <AppointmentDetail
+                style={{
+                  marginTop: Dimensions.get('window').height * 0.01,
+                  marginBottom: Dimensions.get('window').height * 0.01,
+                }}>
+                <AppointmentLabel>
+                  <AppointmentLabelText>
+                    Appointment Taken by
+                  </AppointmentLabelText>
+                </AppointmentLabel>
+                <AppointmentInfo>
+                  <AppointmentInfoText>{`${con.doctor.initailName} ${con.doctor.fName} ${con.doctor.lName}`}</AppointmentInfoText>
+                </AppointmentInfo>
+              </AppointmentDetail>
+              <AppointmentDetail
+                style={{
+                  marginTop: Dimensions.get('window').height * 0.01,
+                  marginBottom: Dimensions.get('window').height * 0.01,
+                }}>
+                <AppointmentLabel>
+                  <AppointmentLabelText>Booked On</AppointmentLabelText>
+                </AppointmentLabel>
+                <AppointmentInfo>
+                  <AppointmentInfoText>{booked}</AppointmentInfoText>
+                </AppointmentInfo>
+              </AppointmentDetail>
+              <AppointmentDetail
+                style={{
+                  marginTop: Dimensions.get('window').height * 0.01,
+                  marginBottom: Dimensions.get('window').height * 0.01,
+                }}>
+                <AppointmentLabel>
+                  <AppointmentLabelText>Appointment Fee</AppointmentLabelText>
+                </AppointmentLabel>
+                <AppointmentInfo direction="row">
+                  <FontAwesome
+                    name="rupee"
+                    size={24}
+                    color="red"
+                    style={{
+                      paddingRight: Dimensions.get('window').width * 0.02,
+                    }}
+                  />
+                  <AppointmentInfoText>{con.data.fee}</AppointmentInfoText>
+                </AppointmentInfo>
+              </AppointmentDetail>
+              <AppointmentDetail
+                style={{
+                  marginTop: Dimensions.get('window').height * 0.01,
+                  marginBottom: Dimensions.get('window').height * 0.01,
+                }}>
+                <AppointmentLabel>
+                  <AppointmentLabelText>Doctor Review</AppointmentLabelText>
+                </AppointmentLabel>
+                <AppointmentInfo>
+                  <AppointmentInfoText>
+                    {con.doctor.review ? con.doctor.review : 'Not Given yet'}
+                  </AppointmentInfoText>
+                </AppointmentInfo>
+              </AppointmentDetail>
+              {con.data.review ? (
+                <AppointmentDetail
                   style={{
-                    paddingRight: Dimensions.get('window').width * 0.02,
-                  }}
-                />
-                <AppointmentInfoText>258</AppointmentInfoText>
-              </AppointmentInfo>
-            </AppointmentDetail>
-            <AppointmentDetail
-              style={{
-                marginTop: Dimensions.get('window').height * 0.01,
-                marginBottom: Dimensions.get('window').height * 0.01,
-              }}>
-              <AppointmentLabel>
-                <AppointmentLabelText>Review</AppointmentLabelText>
-              </AppointmentLabel>
-              <AppointmentInfo>
-                <AppointmentInfoText>your review</AppointmentInfoText>
-              </AppointmentInfo>
-            </AppointmentDetail>
-            <AppointmentDetail
-              style={{
-                marginTop: Dimensions.get('window').height * 0.01,
-                marginBottom: Dimensions.get('window').height * 0.01,
-              }}>
-              <AppointmentInfo>
-                <TextInputStyled
-                  value={feeback}
-                  placeholder="Provide your feedback"
-                  placeholderTextColor={theme.text_secondary}
-                  multiline={true}
-                />
-              </AppointmentInfo>
-            </AppointmentDetail>
-          </ScrollView>
-        </AppointmentBody>
-        <AppointmentFooter
-          style={{
-            paddingRight: Dimensions.get('window').width * 0.02,
-          }}>
-          <Entypo
-            name="check"
-            size={25}
-            color="green"
+                    marginTop: Dimensions.get('window').height * 0.01,
+                    marginBottom: Dimensions.get('window').height * 0.01,
+                  }}>
+                  <AppointmentLabel>
+                    <AppointmentLabelText>Your Review</AppointmentLabelText>
+                  </AppointmentLabel>
+                  <AppointmentInfo>
+                    <AppointmentInfoText>{con.data.review}</AppointmentInfoText>
+                  </AppointmentInfo>
+                </AppointmentDetail>
+              ) : (
+                <AppointmentDetail
+                  style={{
+                    marginTop: Dimensions.get('window').height * 0.01,
+                    marginBottom: Dimensions.get('window').height * 0.01,
+                  }}>
+                  <TextInputStyled
+                    value={feeback}
+                    placeholder="Provide your feedback"
+                    placeholderTextColor={theme.text_secondary}
+                    multiline={true}
+                    onChangeText={txt => setFeedback(txt)}
+                  />
+                </AppointmentDetail>
+              )}
+            </ScrollView>
+          </AppointmentBody>
+          <AppointmentFooter
             style={{
               paddingRight: Dimensions.get('window').width * 0.02,
-            }}
-          />
-          <AppointmentFooterText>Accepted</AppointmentFooterText>
-        </AppointmentFooter>
-      </EachAppointment>
+            }}>
+            <Entypo
+              name="check"
+              size={25}
+              color="green"
+              style={{
+                paddingRight: Dimensions.get('window').width * 0.02,
+              }}
+            />
+            <AppointmentFooterText>{con.status}</AppointmentFooterText>
+          </AppointmentFooter>
+        </EachAppointment>
+      );
+    });
+  };
+
+  const notAvalibaleUI = () => {
+    return (
+      <NotAvalibaleCont>
+        <NotAvalibaleText>
+          You havent made any consult with any doctor yet.
+        </NotAvalibaleText>
+      </NotAvalibaleCont>
     );
   };
 
@@ -140,17 +192,27 @@ export default function Appointments() {
         contentContainerStyle={{flexGrow: 1}}
         nestedScrollEnabled={true}>
         <MainContainer>
-          {eachAppointmentUI()}
-          {eachAppointmentUI()}
-          {eachAppointmentUI()}
-          {eachAppointmentUI()}
-          {eachAppointmentUI()}
-          {eachAppointmentUI()}
+          <Snapshots />
+          <ConsultsSnapshot />
+          {consultsStore.allConsults.length > 0
+            ? eachAppointmentUI()
+            : notAvalibaleUI()}
         </MainContainer>
       </ScrollView>
     </ThemeProvider>
   );
 }
+
+const NotAvalibaleCont = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
+
+const NotAvalibaleText = styled.Text`
+  color: orange;
+  font-size: 20px;
+`;
 
 const TimeCont = styled.View``;
 const DateCont = styled.View``;
@@ -169,17 +231,20 @@ const AppointmentHeading = styled.View`
   flex-direction: row;
 `;
 const TextInputStyled = styled.TextInput`
+  flex: 1;
   border-bottom-color: ${props => props.theme.text_secondary};
   border-bottom-width: 1px;
-  width: 100%;
+  /* width: 100%; */
+  color: white;
+  font-size: 20px;
 `;
 const AppointmentInfoText = styled.Text`
   color: ${props => props.theme.text_primary};
   font-size: 22px;
 `;
 const AppointmentInfo = styled.View`
-flex-direction: ${props => props?.direction ? 'row' : 'column'};
-align-items: ${props => props?.direction ? 'center' : 'flex-start'};
+  flex-direction: ${props => (props?.direction ? 'row' : 'column')};
+  align-items: ${props => (props?.direction ? 'center' : 'flex-start')};
 `;
 const AppointmentDetail = styled.View``;
 

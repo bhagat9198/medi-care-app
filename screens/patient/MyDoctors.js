@@ -1,80 +1,103 @@
 /* eslint-disable */
 
-import React, {useState} from 'react';
+import React from 'react';
 import {Dimensions, ScrollView, TouchableHighlight} from 'react-native';
-import {useSelector, useDispatch} from 'react-redux';
+import {useSelector} from 'react-redux';
 import styled, {ThemeProvider} from 'styled-components';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import ConsultsSnapshot from './../../components/helpers/ConsultsSnapshot';
+import {StackPatient} from './../../constants/Navigation';
 
-export default function MyDoctors() {
+export default function MyDoctors(props) {
   const theme = useSelector(state => state.appReducer.colors);
+  let consultsStore = useSelector(state => state.consultsReducer);
+  let consultsStoreArr = consultsStore.allConsults;
+  let acceptedConsults = consultsStoreArr.filter(
+    cs => cs.status === 'Scheduled',
+  );
 
   const eachDoctorUI = () => {
-    return (
-      <EachDoctor
-        style={{
-          marginBottom: Dimensions.get('window').height * 0.05,
-        }}>
-        <DoctorHeading
+    return acceptedConsults.map((con, index) => {
+      return (
+        <EachDoctor key={index}
           style={{
-            paddingTop: Dimensions.get('window').height * 0.02,
-            paddingBottom: Dimensions.get('window').height * 0.02,
+            marginBottom: Dimensions.get('window').height * 0.05,
           }}>
-          <HeadingText>Doctor Name</HeadingText>
-        </DoctorHeading>
-        <DoctorBody>
-          <ScrollView nestedScrollEnabled={true}>
-            <BodyCont
-              style={{
-                paddingTop: Dimensions.get('window').height * 0.02,
-                paddingBottom: Dimensions.get('window').height * 0.02,
-                paddingLeft: Dimensions.get('window').width * 0.02,
-                paddingRight: Dimensions.get('window').width * 0.02,
-              }}></BodyCont>
-
-            <BodyText>Consult History</BodyText>
-            {eachConsultUI()}
-            {eachConsultUI()}
-          </ScrollView>
-        </DoctorBody>
-        <DoctorFooter
-          style={{
-            paddingTop: Dimensions.get('window').height * 0.01,
-            paddingBottom: Dimensions.get('window').height * 0.01,
-          }}>
-          <TouchableHighlight activeOpacity={1}>
-            <FooterCont>
-              <FooterText>More about the doctor</FooterText>
-              <AntDesign
-                name="right"
-                size={24}
-                color="green"
+          <DoctorHeading
+            style={{
+              paddingTop: Dimensions.get('window').height * 0.02,
+              paddingBottom: Dimensions.get('window').height * 0.02,
+            }}>
+            <HeadingText>{`${con.doctor.initailName} ${con.doctor.fName} ${con.doctor.lName}`}</HeadingText>
+          </DoctorHeading>
+          <DoctorBody>
+            <ScrollView nestedScrollEnabled={true}>
+              <BodyCont
                 style={{
-                  paddingLeft: Dimensions.get('window').width * 0.01,
-                }}
-              />
-            </FooterCont>
-          </TouchableHighlight>
-        </DoctorFooter>
-      </EachDoctor>
-    );
+                  paddingTop: Dimensions.get('window').height * 0.02,
+                  paddingBottom: Dimensions.get('window').height * 0.02,
+                  paddingLeft: Dimensions.get('window').width * 0.02,
+                  paddingRight: Dimensions.get('window').width * 0.02,
+                }}></BodyCont>
+
+              <BodyText>Consult History</BodyText>
+              {eachConsultUI(con)}
+            </ScrollView>
+          </DoctorBody>
+          <DoctorFooter
+            style={{
+              paddingTop: Dimensions.get('window').height * 0.01,
+              paddingBottom: Dimensions.get('window').height * 0.01,
+            }}>
+            <TouchableHighlight
+              activeOpacity={1}
+              onPress={() => props.navigation.navigate(StackPatient.doctor, {
+                uid: con.doctor.docId,
+                userType: con.doctor.docType
+              })}>
+              <FooterCont>
+                <FooterText>More about the doctor</FooterText>
+                <AntDesign
+                  name="right"
+                  size={24}
+                  color="green"
+                  style={{
+                    paddingLeft: Dimensions.get('window').width * 0.01,
+                  }}
+                />
+              </FooterCont>
+            </TouchableHighlight>
+          </DoctorFooter>
+        </EachDoctor>
+      );
+    });
   };
 
-  const eachConsultUI = () => {
+  const eachConsultUI = con => {
+    let booked = new Date(con.booked).toISOString().split('T')[0];
+    let date = new Date(con.data.date).toISOString().split('T')[0];
+    let time = new Date(con.data.time.seconds * 1000)
+      .toISOString()
+      .split('T')[1]
+      .split('.')[0];
     return (
       <EachConsult
         style={{
           marginBottom: Dimensions.get('window').height * 0.02,
           marginTop: Dimensions.get('window').height * 0.02,
-        }}>
-        <ConsultHeading>
-          <ConsultDateText>22nc Oct</ConsultDateText>
-          <ConsultDayText>SAT</ConsultDayText>
-        </ConsultHeading>
-        <ConsultBody style={{
           paddingLeft: Dimensions.get('window').width * 0.02,
-          paddingRight: Dimensions.get('window').width * 0.02,
+            paddingRight: Dimensions.get('window').width * 0.02,
         }}>
+        <ConsultHeading >
+          <ConsultDateText>{date} </ConsultDateText>
+          <ConsultDayText> {time}</ConsultDayText>
+        </ConsultHeading>
+        <ConsultBody
+          style={{
+            marginTop: Dimensions.get('window').height * 0.02,
+            paddingLeft: Dimensions.get('window').width * 0.02,
+            paddingRight: Dimensions.get('window').width * 0.02,
+          }}>
           <ConsultDetail
             style={{
               paddingBottom: Dimensions.get('window').height * 0.01,
@@ -86,9 +109,7 @@ export default function MyDoctors() {
               <ConsultLabelText>Cause</ConsultLabelText>
             </ConsultLabel>
             <ConsultInfo>
-              <ConsultInfoText>
-                gilyfyul sgrnwho owehsgi vhiuw igfsegrhwe ioaugigaw
-              </ConsultInfoText>
+              <ConsultInfoText>{con.data.title}</ConsultInfoText>
             </ConsultInfo>
           </ConsultDetail>
           <ConsultDetail
@@ -102,7 +123,21 @@ export default function MyDoctors() {
               <ConsultLabelText>Cost</ConsultLabelText>
             </ConsultLabel>
             <ConsultInfo>
-              <ConsultInfoText>569</ConsultInfoText>
+              <ConsultInfoText>{con.data.fee}</ConsultInfoText>
+            </ConsultInfo>
+          </ConsultDetail>
+          <ConsultDetail
+            style={{
+              paddingBottom: Dimensions.get('window').height * 0.01,
+            }}>
+            <ConsultLabel
+              style={{
+                marginRight: Dimensions.get('window').width * 0.02,
+              }}>
+              <ConsultLabelText>Booked On</ConsultLabelText>
+            </ConsultLabel>
+            <ConsultInfo>
+              <ConsultInfoText> {booked}</ConsultInfoText>
             </ConsultInfo>
           </ConsultDetail>
           <ConsultDetail
@@ -116,7 +151,10 @@ export default function MyDoctors() {
               <ConsultLabelText>Doctor Review</ConsultLabelText>
             </ConsultLabel>
             <ConsultInfo>
-              <ConsultInfoText>gilyfyul</ConsultInfoText>
+              <ConsultInfoText>
+                {' '}
+                {con.doctor.review ? con.doctor.review : 'Not Given yet'}
+              </ConsultInfoText>
             </ConsultInfo>
           </ConsultDetail>
           <ConsultDetail
@@ -130,7 +168,10 @@ export default function MyDoctors() {
               <ConsultLabelText>Your Review</ConsultLabelText>
             </ConsultLabel>
             <ConsultInfo>
-              <ConsultInfoText>gilyfyul</ConsultInfoText>
+              <ConsultInfoText>
+                {' '}
+                {con.data.review ? con.data.review : 'Not Given yet'}
+              </ConsultInfoText>
             </ConsultInfo>
           </ConsultDetail>
         </ConsultBody>
@@ -138,19 +179,40 @@ export default function MyDoctors() {
     );
   };
 
+  const notAvalibaleUI = () => {
+    return (
+      <NotAvalibaleCont>
+        <NotAvalibaleText>
+          You havent made any consult with any doctor yet.
+        </NotAvalibaleText>
+      </NotAvalibaleCont>
+    );
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <MainContainer>
+        <ConsultsSnapshot />
         <ScrollView
           contentContainerStyle={{flexGrow: 1}}
           nestedScrollEnabled={true}>
-          {eachDoctorUI()}
-          {eachDoctorUI()}
+          {acceptedConsults.length > 0 ? eachDoctorUI() : notAvalibaleUI()}
         </ScrollView>
       </MainContainer>
     </ThemeProvider>
   );
 }
+
+const NotAvalibaleCont = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
+
+const NotAvalibaleText = styled.Text`
+  color: orange;
+  font-size: 20px;
+`;
 
 const ConsultInfoText = styled.Text`
   color: ${props => props.theme.text_primary};

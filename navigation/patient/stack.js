@@ -396,7 +396,7 @@ export const RemindersStackScreen = props => {
 const MedReportsScreen = () => {
   return (
     <Stack.Screen
-      name={StackPatient.medReports}
+      name={StackPatient.medReports}  
       component={MedReports}
       options={{
         title: 'My Medical Reports',
@@ -419,7 +419,7 @@ const MedReportsScreen = () => {
 export const MedReportsStackScreen = props => {
   return (
     <Stack.Navigator screenOptions={() => drawerCommonStyles(props)}>
-      {medReports()}
+      {MedReportsScreen()}
     </Stack.Navigator>
   );
 };

@@ -14,9 +14,8 @@ export const storeSymptomsDescription = () => {
       .doc('symptomsDescriptio')
       .set({data: [...symptomsDescriptionData]})
       .then(() => {
-        console.log('done');
       }).catch(error => {
-        console.log(error);
+        // console.log(error);
       })
   };
 };
@@ -28,9 +27,8 @@ export const storeSymptomPrecaution = () => {
       .doc('symptomPrecaution')
       .set({data: [...symptomPrecautionData]})
       .then(() => {
-        console.log('done');
       }).catch(error => {
-        console.log(error);
+        // console.log(error);
       })
   };
 };
@@ -49,10 +47,9 @@ export const storeDataSet = () => {
     let ref = await firestore().collection('miscellaneous').doc('dataset');
     await ref.get().then(async doc => {
       let docData = doc.data();
-      console.log(obj.length);
+      // console.log(obj.length);
       docData.data.push(...obj);
       await ref.update(docData);
-      console.log('done');
     });
   };
 };

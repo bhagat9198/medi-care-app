@@ -196,7 +196,20 @@ export const AllArticlesStackScreen = props => {
           },
         }}
       />
-      <AllArticlesStack.Screen name={StackDoctor.article} component={Article} />
+      <AllArticlesStack.Screen name={StackDoctor.article} component={Article} options={{
+        title: 'Article',
+        headerRight: () => {
+          return (
+            <View style={{paddingRight: 15}}>
+              <Ionicons
+                name="newspaper-outline"
+                size={24}
+                color={appColor.dark.text_secondary}
+              />
+            </View>
+          );
+        },
+      }} />
     </AllArticlesStack.Navigator>
   );
 };
@@ -229,7 +242,20 @@ export const MyArticlesStackScreen = props => {
           },
         }}
       />
-      <MyArticlesStack.Screen name={StackDoctor.article} component={Article} />
+      <MyArticlesStack.Screen name={StackDoctor.article} component={Article} options={{
+        title: 'Article',
+        headerRight: () => {
+          return (
+            <View style={{paddingRight: 15}}>
+              <Ionicons
+                name="newspaper-outline"
+                size={24}
+                color={appColor.dark.text_secondary}
+              />
+            </View>
+          );
+        },
+      }} />
     </MyArticlesStack.Navigator>
   );
 };
@@ -298,7 +324,7 @@ export const DoctorsStackScreen = props => {
         component={Doctor}
         name={StackDoctor.doctor}
         options={{
-          title: 'Doctors',
+          title: 'Doctor',
           headerRight: () => {
             return (
               <View style={{flexDirection: 'row'}}>

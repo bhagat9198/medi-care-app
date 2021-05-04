@@ -43,7 +43,7 @@ export default function LogIn(props) {
       );
     }
     let result = await dispatch(loginAction(email, password, userType));
-    console.log('result signIN', result);
+    // console.log('result signIN', result);
       if (!result.userStatus) {
         props.setErrorHandler(result.message);
         return Alert.alert('LogIn Error', result.message);

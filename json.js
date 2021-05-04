@@ -98419,9 +98419,9 @@ jsonData.map(el => {
 });
 
 firestore.collection('dataset').doc('diseaseAndSymptoms').set(jsonData).then(() => {
-  console.log('done');
+//   console.log('done');
 }).catch(error => {
-  console.log(error.message);
+//   console.log(error.message);
 })
 
 

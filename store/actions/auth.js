@@ -3,19 +3,22 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-const db = firestore();
-export const AUTHENTICATION = 'AUTHENTICATION';
+
 export const LOGOUT = 'LOGOUT';
+export const UPDATE_USER_STATE = 'UPDATE_USER_STATE';
+export const UPDATE_CONSULTS_STATE = 'UPDATE_CONSULTS_STATE';
+
+const db = firestore();
 
 export const loginAction = (email, password, userType) => {
   return (dispatch, getState) => {
     return auth()
       .signInWithEmailAndPassword(email, password)
       .then(user => {
-        if(!user) {
+        if (!user) {
           return {userStatus: false, message: 'Invalid Creditionals'};
         }
-        console.log('user.user', user.user);
+        // console.log('user.user', user.user);
         let storeData = {
           userType: userType,
         };
@@ -23,22 +26,24 @@ export const loginAction = (email, password, userType) => {
 
         return db.collection(userType).doc(user.user.uid).get();
       })
-      .then(async(doc) => {
+      .then(async doc => {
         let docData = doc.data();
-        if(!docData) {
-          return {userStatus: false, message: 'Invalid Creditionals. Please double check your user type ie doctor or patient'};
+        if (!docData) {
+          return {
+            userStatus: false,
+            message:
+              'Invalid Creditionals. Please double check your user type ie doctor or patient',
+          };
         }
         await dispatch({
-          type: AUTHENTICATION,
+          type: UPDATE_USER_STATE,
           data: {
             ...docData,
           },
         });
-        return {userStatus: true, message: 'User LogedIn'}; 
+        return {userStatus: true, message: 'User LogedIn'};
       })
       .catch(error => {
-        console.log('hello ERRORRR');
-        console.log(error);
         return {userStatus: false, message: error.message};
       });
   };
@@ -50,7 +55,6 @@ export const signupAction = data => {
     return auth()
       .createUserWithEmailAndPassword(data.email, data.password)
       .then(user => {
-        console.log('user ss', user);
         // let token = user.user.toJSON().stsTokenManager;
         let storeData = {
           userType: data.userType,
@@ -58,26 +62,21 @@ export const signupAction = data => {
         storeUserInfoInApp(storeData);
 
         delete data.password;
-        U_DATA.userId = user.user.uid;
         U_DATA = {
-          ...U_DATA,
           ...data,
+          created: new Date().valueOf(),
+          loginHistory: [],
+          userId: user.user.uid,
         };
-        console.log('U_DATA', U_DATA);
-        let collectionName = 'patients';
-        console.log('data.userType', data.userType, data.userType=='doctors');
+
+        let collectionName = data.userType;
         if (data.userType == 'doctors') {
-          collectionName = 'doctors';
-          U_DATA.registeredPatients = [];
-          U_DATA.appointments = [];
-          U_DATA.onlineConsult = [];
-          U_DATA.offlineConsult = [];
+          U_DATA.consults = [];
           U_DATA.articles = [];
         } else {
           U_DATA.diseases = [];
           U_DATA.reminders = [];
-          U_DATA.onlineConsult = [];
-          U_DATA.offlineConsult = [];
+          U_DATA.consults = [];
           U_DATA.doctorsVisited = [];
         }
 
@@ -89,56 +88,47 @@ export const signupAction = data => {
           });
       })
       .then(() => {
-
-        console.log('one creadting');
         dispatch({
-          type: AUTHENTICATION,
-          data: { 
+          type: UPDATE_USER_STATE,
+          data: {
             ...U_DATA,
           },
         });
         return {userStatus: true, message: 'User Created'};
       })
       .catch(error => {
-        console.log(error);
-        return {userStatus: false, message: error.message};
+        // console.log(error);
+        return {userStatus: false, message: `AUTH ${error.message}`};
       });
   };
 };
 
 export const autoLogin = () => {
   return dispatch => {
-    return auth().onAuthStateChanged(async(user) => {
+    return auth().onAuthStateChanged(async user => {
       if (user) {
         let U_DATA = {};
-        // change screen to dashbaord
-        console.log('USER', user);
         let extractedData = await AsyncStorage.getItem('@userType');
         let userData = await JSON.parse(extractedData);
-        console.log('userData', userData);
+        let collectionName = userData.userType;
 
-        let collectionName = 'patients';
-        if (userData.userType == 'doctors') {
-          collectionName = 'doctors';
-        }
-        console.log('collectionName', collectionName);
-        return await db.collection(collectionName)
-          .doc(user.uid)
+        let ref = await db.collection(collectionName).doc(user.uid);
+        return await ref
           .get()
           .then(async(doc) => {
             let docData = doc.data();
             U_DATA = {...docData};
             await dispatch({
-              type: AUTHENTICATION,
+              type: UPDATE_USER_STATE,
               data: {
                 ...U_DATA,
               },
             });
-            console.log('done');
-            return {userStatus: true, message: 'Auto Login Success'}
-          }).catch(error => {
-            return {userStatus: false, message: error.message}
+            return {userStatus: true, message: 'Auto Login Success'};
           })
+          .catch(error => {
+            return {userStatus: false, message: error.message};
+          });
       } else {
         // keep screen to login
         return {userStatus: false, message: 'User Not Found'};
@@ -168,3 +158,23 @@ export const logout = () => {
       });
   };
 };
+
+export const updateUserState = data => {
+  return (dispatch) => {
+    dispatch({
+      type: UPDATE_USER_STATE,
+      data: data
+    })
+  }
+}
+
+export const updateConsultsState = data => {
+  return (dispatch) => {
+    dispatch({
+      type: UPDATE_CONSULTS_STATE,
+      data: data
+    })
+  }
+}
+
+

@@ -8,7 +8,6 @@ import {
   Text,
   TouchableNativeFeedback,
 } from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
 
 import {appColor} from '../../constants/App';
 

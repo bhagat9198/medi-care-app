@@ -14,6 +14,7 @@ const BottomTab = createBottomTabNavigator();
 export const ConsultsBottomTabScreens = () => {
   return (
     <BottomTab.Navigator
+    initialRouteName={TabPatient.offlineConsults}
       tabBarOptions={{
         activeBackgroundColor: appColor.dark.primary,
         inactiveBackgroundColor: appColor.dark.secondary,

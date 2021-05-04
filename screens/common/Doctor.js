@@ -1,18 +1,42 @@
 /* eslint-disable */
 
-import React from 'react';
-import {Dimensions, ScrollView, TouchableWithoutFeedback} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  Alert,
+  Dimensions,
+  ScrollView,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import styled, {ThemeProvider} from 'styled-components/native';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import openMap from 'react-native-open-maps';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
+import {extractEachDoc} from './../../store/actions/doctor';
+
 export default function Doctor(props) {
   const theme = useSelector(state => state.appReducer.colors);
+  const [docData, setDocData] = useState(false);
+  const dispatch = useDispatch();
+  // console.log(docData);
+
+  useEffect(async () => {
+    let res = await dispatch(
+      extractEachDoc(props.route.params.uid, props.route.params.userType),
+    );
+    if (res.status) {
+      setDocData(res.data);
+    } else {
+      Alert.alert(res.title, res.message);
+    }
+  }, []);
 
   const openMapHandler = () => {
-    console.log('click');
-    return openMap({latitude: 13.0830973, longitude: 77.5467358});
+    // console.log('click');
+    return openMap({
+      latitude: Number(docData.hospital.locationUrl[0]),
+      longitude: Number(docData.hospital.locationUrl[1]),
+    });
   };
 
   const doctorDetails = () => {
@@ -31,7 +55,7 @@ export default function Doctor(props) {
             <LabelText>Gender</LabelText>
           </DetailLabel>
           <DetailInfo>
-            <InfoText>Male</InfoText>
+            <InfoText>{docData.gender}</InfoText>
           </DetailInfo>
         </DoctorDetail>
         <DoctorDetail>
@@ -39,7 +63,7 @@ export default function Doctor(props) {
             <LabelText>Email</LabelText>
           </DetailLabel>
           <DetailInfo>
-            <InfoText>Male</InfoText>
+            <InfoText>{docData.email}</InfoText>
           </DetailInfo>
         </DoctorDetail>
         <DoctorDetail>
@@ -47,7 +71,7 @@ export default function Doctor(props) {
             <LabelText>Phone Bymber</LabelText>
           </DetailLabel>
           <DetailInfo>
-            <InfoText>78945631</InfoText>
+            <InfoText>{docData.phone}</InfoText>
           </DetailInfo>
         </DoctorDetail>
       </DoctorDetails>
@@ -70,28 +94,19 @@ export default function Doctor(props) {
             <LabelText>Specializations</LabelText>
           </HospitalDetailLabel>
           <HospitalDetailInfo>
-            <EachSpecialization>
-              <AntDesign
-                name="arrowright"
-                size={20}
-                color="white"
-                style={{
-                  paddingRight: Dimensions.get('window').width * 0.02,
-                }}
-              />
-              <SpecializationText>Lol</SpecializationText>
-            </EachSpecialization>
-            <EachSpecialization>
-              <AntDesign
-                name="arrowright"
-                size={20}
-                color="white"
-                style={{
-                  paddingRight: Dimensions.get('window').width * 0.02,
-                }}
-              />
-              <SpecializationText>Lol</SpecializationText>
-            </EachSpecialization>
+            {docData?.hospital?.specializations.map(el => (
+              <EachSpecialization key={Math.random()}>
+                <AntDesign
+                  name="arrowright"
+                  size={20}
+                  color="white"
+                  style={{
+                    paddingRight: Dimensions.get('window').width * 0.02,
+                  }}
+                />
+                <SpecializationText>{el}</SpecializationText>
+              </EachSpecialization>
+            ))}
           </HospitalDetailInfo>
         </HospitalDetail>
         <HospitalDetail>
@@ -99,20 +114,19 @@ export default function Doctor(props) {
             <LabelText>Services</LabelText>
           </HospitalDetailLabel>
           <HospitalDetailInfo>
-            <EachSpecialization
-              style={{
-                paddingLeft: Dimensions.get('window').width * 0.05,
-              }}>
-              <AntDesign
-                name="arrowright"
-                size={20}
-                color="white"
-                style={{
-                  paddingRight: Dimensions.get('window').width * 0.02,
-                }}
-              />
-              <SpecializationText>Lol</SpecializationText>
-            </EachSpecialization>
+            {docData?.hospital?.services.map(el => (
+              <EachSpecialization key={Math.random()}>
+                <AntDesign
+                  name="arrowright"
+                  size={20}
+                  color="white"
+                  style={{
+                    paddingRight: Dimensions.get('window').width * 0.02,
+                  }}
+                />
+                <SpecializationText>{el}</SpecializationText>
+              </EachSpecialization>
+            ))}
           </HospitalDetailInfo>
         </HospitalDetail>
         <HospitalDetail>
@@ -120,7 +134,7 @@ export default function Doctor(props) {
             <LabelText>Location</LabelText>
           </HospitalDetailLabel>
           <HospitalDetailInfo>
-            <InfoText>xzhfuk</InfoText>
+            <InfoText>{docData?.hospital?.location}</InfoText>
           </HospitalDetailInfo>
         </HospitalDetail>
         <HospitalDetail>
@@ -128,7 +142,7 @@ export default function Doctor(props) {
             <LabelText>About Hosiptal/Clinic</LabelText>
           </HospitalDetailLabel>
           <HospitalDetailInfo>
-            <InfoText>Hey sdnfjhduph</InfoText>
+            <InfoText>{docData?.hospital?.about}</InfoText>
           </HospitalDetailInfo>
         </HospitalDetail>
         <HospitalDetail>
@@ -144,7 +158,7 @@ export default function Doctor(props) {
               paddingTop: Dimensions.get('window').height * 0.005,
               paddingBottom: Dimensions.get('window').height * 0.005,
             }}>
-            <TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={openMapHandler}>
               <BtnText>Click here to get full detail on GMap</BtnText>
             </TouchableWithoutFeedback>
           </HospitalDetailInfo>
@@ -192,6 +206,36 @@ export default function Doctor(props) {
     );
   };
 
+  const doctorGallery = () => {
+    return (
+      <AllPicsCont>
+        {docData.hospital.imgs.map(el => ( 
+          <EachPic key={Math.random()}>
+            <ImageStyled
+              onError={error => {
+                // console.log('error img', error);
+              }}
+              testID={el.name}
+              resizeMethod="resize"
+              resizeMode="contain"
+              source={{uri: el.url}}
+            />
+          </EachPic>
+        ))}
+      </AllPicsCont>
+    );
+  };
+
+  const notAvaliable = () => {
+    return (
+      <NotAvaliableCont>
+        <NotAvaliableContText>
+          Doctor still need to upadate. Try another time
+        </NotAvaliableContText>
+      </NotAvaliableCont>
+    );
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <ScrollView contentContainerStyle={{flexGrow: 1}}>
@@ -205,7 +249,7 @@ export default function Doctor(props) {
             }}>
             <ImageStyled
               onError={error => {
-                console.log('error img', error);
+                // console.log('error img', error);
               }}
               testID="mainIMG"
               resizeMethod="resize"
@@ -248,64 +292,45 @@ export default function Doctor(props) {
                 <HeadingContText>Articles</HeadingContText>
               </HeadingCont>
             </MainHeadingCont>
-            {doctorArticles()}
+            {docData?.articles?.length > 0 ? doctorArticles() : notAvaliable()}
           </DoctorArticlesCont>
-          <GalleryCont>
-            <MainHeadingCont>
-              <SubHeadingCont>
-                <SubHeadingContText>Have a Look</SubHeadingContText>
-              </SubHeadingCont>
-              <HeadingCont>
-                <HeadingContText>Gallery</HeadingContText>
-              </HeadingCont>
-            </MainHeadingCont>
-            <AllPicsCont>
-              <EachPic>
-              <ImageStyled
-              onError={error => {
-                console.log('error img', error);
-              }}
-              testID="mainIMG1"
-              resizeMethod="resize"
-              resizeMode="contain"
-              source={require('./../../assets/images/stethoscope.png')}
-            />
-              </EachPic>
-              <EachPic>
-              <ImageStyled
-              onError={error => {
-                console.log('error img', error);
-              }}
-              testID="mainIMG2"
-              resizeMethod="resize"
-              resizeMode="contain"
-              source={require('./../../assets/images/stethoscope.png')}
-            />
-              </EachPic>
-              <EachPic>
-              <ImageStyled
-              onError={error => {
-                console.log('error img', error);
-              }}
-              testID="mainIMG3"
-              resizeMethod="resize"
-              resizeMode="contain"
-              source={require('./../../assets/images/stethoscope.png')}
-            />
-              </EachPic>
-            </AllPicsCont>
-          </GalleryCont>
+
+          <MainHeadingCont>
+            <SubHeadingCont>
+              <SubHeadingContText>Have a Look</SubHeadingContText>
+            </SubHeadingCont>
+            <HeadingCont>
+              <HeadingContText>Gallery</HeadingContText>
+            </HeadingCont>
+          </MainHeadingCont>
+          {docData?.hospital?.imgs?.length > 0
+            ? doctorGallery()
+            : notAvaliable()}
         </MainContainer>
       </ScrollView>
     </ThemeProvider>
   );
 }
 
+const NotAvaliableContText = styled.Text`
+  color: ${props => props.theme.text_primary};
+  font-size: 20px;
+  padding-bottom: ${props => Dimensions.get('window').height * 0.02}px;
+  padding-top: ${props => Dimensions.get('window').height * 0.02}px;
+`;
+
+const NotAvaliableCont = styled.View`
+  padding-bottom: ${props => Dimensions.get('window').height * 0.02}px;
+  padding-top: ${props => Dimensions.get('window').height * 0.02}px;
+  justify-content: center;
+  align-items: center;
+`;
+
 const EachPic = styled.View`
-width: 100%;
-height: 300px;
-padding-bottom: ${props => Dimensions.get('window').height * 0.02}px;
-padding-top: ${props => Dimensions.get('window').height * 0.02}px;
+  width: 100%;
+  height: 300px;
+  padding-bottom: ${props => Dimensions.get('window').height * 0.02}px;
+  padding-top: ${props => Dimensions.get('window').height * 0.02}px;
 `;
 const AllPicsCont = styled.View``;
 const GalleryCont = styled.View``;
@@ -321,22 +346,22 @@ const ArticleHeadingText = styled.Text`
   font-weight: bold;
 `;
 const ArticleSubHeading = styled.View`
-align-items: flex-end;
+  align-items: flex-end;
 `;
 const ArticleHeading = styled.View`
-padding-bottom: ${props => Dimensions.get('window').height * 0.02}px;
+  padding-bottom: ${props => Dimensions.get('window').height * 0.02}px;
 `;
 const ArticleTouchableCont = styled.View`
   justify-content: space-between;
 `;
 const EachArticle = styled.View`
-padding-bottom: ${props => Dimensions.get('window').height * 0.01}px;
-padding-left: ${props => Dimensions.get('window').height * 0.02}px;
-padding-right: ${props => Dimensions.get('window').height * 0.02}px;
-margin-bottom: ${props => Dimensions.get('window').height * 0.01}px;
-border-color: ${props => props.theme.text_primary};
-border-width: 1px;
-border-radius: 10px;
+  padding-bottom: ${props => Dimensions.get('window').height * 0.01}px;
+  padding-left: ${props => Dimensions.get('window').height * 0.02}px;
+  padding-right: ${props => Dimensions.get('window').height * 0.02}px;
+  margin-bottom: ${props => Dimensions.get('window').height * 0.01}px;
+  border-color: ${props => props.theme.text_primary};
+  border-width: 1px;
+  border-radius: 10px;
 `;
 const ArticlesCont = styled.View``;
 const DoctorArticlesCont = styled.View``;

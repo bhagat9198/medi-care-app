@@ -4,7 +4,6 @@ import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 
 import {useSelector, useDispatch} from 'react-redux';
-import {TouchableWithoutFeedback, StyleSheet} from 'react-native';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -35,7 +34,7 @@ function DrawerScreens(props) {
   const dispatch = useDispatch();
   return (
     <Drawer.Navigator
-      initialRouteName={DrawerDoctor.doctorsDrawer}
+      initialRouteName={DrawerDoctor.articlesDrawer}
       drawerContent={props => {
         return (
           <DrawerContentScrollView {...props}>

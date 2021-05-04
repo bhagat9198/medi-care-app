@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -8,58 +8,110 @@ import {
   StyleSheet,
   ScrollView,
   Dimensions,
+  Alert,
 } from 'react-native';
+import {useDispatch} from 'react-redux';
+import styled from 'styled-components';
+
 import {appColor} from '../../constants/App';
+import {extractEachArticle} from './../../store/actions/doctor';
 
 export default function Article(props) {
+  const [article, setArticle] = useState({});
+  const [date, setDate] = useState('');
+
+  const dispatch = useDispatch();
+
+  useEffect(async () => {
+    let res = await dispatch(
+      extractEachArticle(
+        props.route.params.userType,
+        props.route.params.docId,
+        props.route.params.articleId,
+      ),
+    );
+    // console.log('res', res);
+    if (res.status) {
+      setArticle(res.data);
+      setDate(new Date(res.data.created).toISOString());
+    } else {
+      return Alert.alert(res.title, res.message);
+    }
+  }, []);
+
+  const imgDisplay = imgOrder => {
+    let path;
+    if (imgOrder === 'top') {
+      path = article?.topImg?.url;
+    } else if (imgOrder === 'middle') {
+      path = article?.middleImg?.url;
+    } else if (imgOrder === 'last') {
+      path = article?.lastImg?.url;
+    }
+
+    return (
+      <ImgCont>
+        <ImageStyled
+          onError={error => {
+            // console.log('error img', error);
+          }}
+          testID={'topImg'}
+          resizeMethod="resize"
+          resizeMode="contain"
+          source={{uri: path}}
+        />
+      </ImgCont>
+    );
+  };
+
   return (
     <View style={{flex: 1, backgroundColor: appColor.dark.primary}}>
       <ScrollView style={{padding: Dimensions.get('window').width * 0.03}}>
-        <View style={styles.mainHeadingCont}>
-          <Text style={[styles.txt, styles.mainHeading]}>
-            Big Long Heading Big Long Heading
-          </Text>
-        </View>
-        <View style={styles.secondHeadingCont}>
-          <View style={styles.secondHeadingView}></View>
-          <Text style={[styles.txt, styles.subHeaing]}>Doctor Name</Text>
-        </View>
-        <View style={styles.articleBodyCont}>
-          <Text style={[styles.txt, styles.articleBody]}>
-            Lorem ipsum, or lipsum as it is sometimes known, is dummy text used
-            in laying out print, graphic or web designs. The passage is
-            attributed to an unknown typesetter in the 15th century who is
-            thought to have scrambled parts of Cicero's De Finibus Bonorum et
-            Malorum for use in a type specimen book.Lorem ipsum, or lipsum as it
-            is sometimes known, is dummy text used in laying out print, graphic
-            or web designs. The passage is attributed to an unknown typesetter
-            in the 15th century who is thought to have scrambled parts of
-            Cicero's De Finibus Bonorum et Malorum for use in a type specimen
-            book.Lorem ipsum, or lipsum as it is sometimes known, is dummy text
-            used in laying out print, graphic or web designs. The passage is
-            attributed to an unknown typesetter in the 15th century who is
-            thought to have scrambled parts of Cicero's De Finibus Bonorum et
-            Malorum for use in a type specimen book.
-          </Text>
-        </View>
-        <View style={styles.secondHeadingCont}>
-          <Text style={[styles.txt, styles.secondHeading]}>
-            About the Doctor
-          </Text>
-        </View>
-        <View style={styles.aboutDocCont}>
-          <Text style={[styles.txt, styles.articleBody]}>
-            Lorem ipsum, or lipsum as it is sometimes known, is dummy text used
-            in laying out print, graphic or web designs. The passage is
-            attributed to an unknown typesetter in the 15th century who is
-            thought to have scrambled parts of Cicero's De Finibus Bonorum et
-            Malorum for use in a type specimen book.
-          </Text>
+        <View style={{paddingBottom: 50}}>
+          <View style={styles.mainHeadingCont}>
+            <Text style={[styles.txt, styles.mainHeading]}>
+              {article?.title}
+            </Text>
+          </View>
+          <View style={styles.secondHeadingCont}>
+            <View style={styles.secondHeadingView}></View>
+            <Text style={[styles.txt, styles.subHeaing]}>
+              {`${article?.initialName} ${article?.fName} ${article?.lName}`}
+            </Text>
+            <View>
+              <Text style={[styles.txt, styles.subHeaing]}>{date}</Text>
+            </View>
+          </View>
+          {article?.topImg?.status ? imgDisplay('top') : null}
+          <View style={styles.articleBodyCont}>
+            <Text style={[styles.txt, styles.articleBody]}>
+              {article?.firstPara}
+            </Text>
+          </View>
+          {article?.topImg?.status ? imgDisplay('middle') : null}
+          <View style={styles.articleBodyCont}>
+            <Text style={[styles.txt, styles.articleBody]}>
+              {article?.lastPara}
+            </Text>
+          </View>
+          {article?.topImg?.status ? imgDisplay('last') : null}
         </View>
       </ScrollView>
     </View>
   );
 }
+
+const ImageStyled = styled.Image`
+  width: 100%;
+  height: 100%;
+`;
+
+const ImgCont = styled.View`
+  width: 100%;
+  height: 300px;
+  margin-top: ${props => Dimensions.get('window').height * 0.02}px;
+  margin-bottom: ${props => Dimensions.get('window').height * 0.02}px;
+`;
 
 const styles = StyleSheet.create({
   txt: {
@@ -101,15 +153,11 @@ const styles = StyleSheet.create({
   },
   articleBodyCont: {
     marginBottom: 30,
-    paddingBottom: 30,
-    borderBottomColor: 'red',
-    borderBottomWidth: 2,
-    borderRadius: 50,
   },
   secondHeadingCont: {
     marginBottom: 20,
   },
   aboutDocCont: {
-    paddingBottom: 50
-  }
+    paddingBottom: 50,
+  },
 });

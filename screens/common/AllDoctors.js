@@ -1,7 +1,8 @@
 /* eslint-disable */
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
+  Alert,
   Dimensions,
   ScrollView,
   StyleSheet,
@@ -9,63 +10,107 @@ import {
   View,
 } from 'react-native';
 import styled, {ThemeProvider} from 'styled-components/native';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import {extractAllDoctors} from './../../store/actions/doctor';
+import {StackDoctor} from './../../constants/Navigation';
+import {useFocusEffect} from '@react-navigation/native';
 
 export default function AllDoctors(props) {
+  const [allDocs, setAllDocs] = useState([]);
   const theme = useSelector(state => state.appReducer.colors);
+  const dispatch = useDispatch();
 
-  const eachDocLeft = () => {
-    return(<EachDocCont
-      style={{
-        marginBottom: Dimensions.get('window').height * 0.05,
-        borderColor: theme.text_primary,
-      }}>
-      <TouchableNativeFeedback
-        onPress={() => {
-          console.log('clicked');
-          return props.navigation.navigate('doctor', {data: 'lol'});
-        }}>
-        <EachDoc>
-          <DetailsContLeft
-            style={{
-              paddingRight: Dimensions.get('window').width * 0.05,
-            }}>
-            <NameCont>
-              <NameText>Dr. ABCD</NameText>
-            </NameCont>
-            <SpecialistCont>
-              <SpecialistText>Dentist</SpecialistText>
-            </SpecialistCont>
-            <HostpitalCont>
-              <HostpitalText>
-                Work at <HostpitalNameText>LOL</HostpitalNameText>{' '}
-              </HostpitalText>
-            </HostpitalCont>
-          </DetailsContLeft>
-          <IconContLeft
-            style={{
-              paddingLeft: Dimensions.get('window').width * 0.05,
-              paddingRight: Dimensions.get('window').width * 0.05,
-            }}>
-            <Fontisto name="doctor" color={theme.text_secondary} size={30} />
-          </IconContLeft>
-        </EachDoc>
-      </TouchableNativeFeedback>
-    </EachDocCont>)
+  // useEffect(async () => {
+  //   let res = await dispatch(extractAllDoctors());
+  //   if (res.status) {
+  //     console.log('exe');
+  //     setAllDocs(res.data);
+  //   } else {
+  //     Alert.alert(res.title, res.message);
+  //   }
+  // }, []);
+
+  async function fectData() {
+    let res = await dispatch(extractAllDoctors());
+    if (res.status) {
+      // console.log('exe', res.data);
+      setAllDocs(res.data);
+    } else {
+      Alert.alert(res.title, res.message);
+    }
   }
 
-  const eachDocRight = () => {
+  useFocusEffect(
+    React.useCallback(() => {
+      fectData();
+    }, []),
+  );
+
+  const eachDocLeft = eachDocData => {
+    // console.log('eachDocData', eachDocData);
     return (
       <EachDocCont
+        key={Math.random()}
         style={{
           marginBottom: Dimensions.get('window').height * 0.05,
           borderColor: theme.text_primary,
         }}>
         <TouchableNativeFeedback
           onPress={() => {
-            console.log('clicked');
-            return props.navigation.navigate('doctor', {data: 'lol'});
+            return props.navigation.navigate(StackDoctor.doctor, {
+              uid: eachDocData.uid,
+              userType: eachDocData.userType,
+            });
+          }}>
+          <EachDoc>
+            <DetailsContLeft
+              style={{
+                paddingRight: Dimensions.get('window').width * 0.05,
+              }}>
+              <NameCont>
+                <NameText>{`${eachDocData.initailName} ${eachDocData.fname} ${eachDocData.lname}`}</NameText>
+              </NameCont>
+              <SpecialistCont>
+                <SpecialistText>{eachDocData.email}</SpecialistText>
+              </SpecialistCont>
+              <HostpitalCont>
+                <HostpitalText>
+                  Work at{'  '}
+                  <HostpitalNameText>
+                    {eachDocData.hospitalName}
+                  </HostpitalNameText>
+                </HostpitalText>
+              </HostpitalCont>
+            </DetailsContLeft>
+            <IconContLeft
+              style={{
+                paddingLeft: Dimensions.get('window').width * 0.05,
+                paddingRight: Dimensions.get('window').width * 0.05,
+              }}>
+              <Fontisto name="doctor" color={theme.text_secondary} size={30} />
+            </IconContLeft>
+          </EachDoc>
+        </TouchableNativeFeedback>
+      </EachDocCont>
+    );
+  };
+
+  const eachDocRight = eachDocData => {
+    return (
+      <EachDocCont
+        key={Math.random()}
+        style={{
+          marginBottom: Dimensions.get('window').height * 0.05,
+          borderColor: theme.text_primary,
+        }}>
+        <TouchableNativeFeedback
+          onPress={() => {
+            // console.log('clicked');
+            return props.navigation.navigate(StackDoctor.doctor, {
+              uid: eachDocData.uid,
+              userType: eachDocData.userType,
+            });
           }}>
           <EachDoc>
             <IconCont
@@ -80,14 +125,17 @@ export default function AllDoctors(props) {
                 paddingLeft: Dimensions.get('window').width * 0.05,
               }}>
               <NameCont>
-                <NameText>Dr. ABCD</NameText>
+                <NameText>{`${eachDocData.initailName} ${eachDocData.fname} ${eachDocData.lname}`}</NameText>
               </NameCont>
               <SpecialistCont>
-                <SpecialistText>Dentist</SpecialistText>
+                <SpecialistText>{eachDocData.email}</SpecialistText>
               </SpecialistCont>
               <HostpitalCont>
                 <HostpitalText>
-                  Work at <HostpitalNameText>LOL</HostpitalNameText>{' '}
+                  Work at{'  '}
+                  <HostpitalNameText>
+                    {eachDocData.hospitalName}
+                  </HostpitalNameText>
                 </HostpitalText>
               </HostpitalCont>
             </DetailsCont>
@@ -97,13 +145,21 @@ export default function AllDoctors(props) {
     );
   };
 
+  const displayDocs = () => {
+    return allDocs.map((el, index) => {
+      if (index % 2 === 0) {
+        return eachDocRight(el);
+      } else {
+        return eachDocLeft(el);
+      }
+    });
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <MainContainer>
         <ScrollView contentContainerStyle={{flexGrow: 1, alignItems: 'center'}}>
-          {eachDocRight()}
-          {eachDocLeft()}
-
+          {displayDocs()}
         </ScrollView>
       </MainContainer>
     </ThemeProvider>
@@ -135,7 +191,7 @@ const NameCont = styled.View``;
 
 const DetailsContLeft = styled.View`
   width: 80%;
-  align-items: flex-end;  
+  align-items: flex-end;
 `;
 
 const DetailsCont = styled.View`

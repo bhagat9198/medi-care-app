@@ -8,54 +8,76 @@ import {
   Text,
   Dimensions,
   TouchableHighlight,
+  Alert,
 } from 'react-native';
 import styled, {ThemeProvider} from 'styled-components';
 import {useSelector, useDispatch} from 'react-redux';
 
 import {appColor} from '../../constants/App';
+import {extractAllArticles} from './../../store/actions/doctor';
+import {StackDoctor} from './../../constants/Navigation';
+import {useFocusEffect} from '@react-navigation/native';
 
 export default function Articles(props) {
   const theme = useSelector(state => state.appReducer.colors);
-  const [allArticles, setAllArticles] = useState(null);
+  const [allArticles, setAllArticles] = useState([]);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
+  // useEffect(async () => {
+  //   let res = await dispatch(extractAllArticles());
+  //   console.log('res', res);
+  //   if (res.status) {
+  //     setAllArticles(res.data);
+  //   } else {
+  //     Alert.alert(res.title, res.message);
+  //   }
+  // }, []);
 
-  }, []);
+  async function fetchData() {
+    let res = await dispatch(extractAllArticles());
+    // console.log('res', res);
+    if (res.status) {
+      setAllArticles(res.data);
+    } else {
+      Alert.alert(res.title, res.message);
+    }
+  }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData();
+    }, [])
+  );
 
   return (
     <ThemeProvider theme={theme}>
       <MainContainer>
         <ScrollView>
           <View style={styles.allArticles}>
-            <View style={styles.eachArticle}>
-              <TouchableHighlight
-                style={{flex: 1}}
-                onPress={() => {
-                  // console.log(props.navigation);
-                  return props.navigation.navigate('article', {data: 'lol'});
-                }}>
-                <View>
-                  <Text style={[styles.txt]}>i am a heading</Text>
-                  <Text style={[styles.txt]}>Doctor Name</Text>
+            {allArticles.map((art, index) => {
+              return (
+                <View style={styles.eachArticle} key={index}>
+                  <TouchableHighlight
+                    style={{flex: 1}}
+                    onPress={() => {
+                      // console.log(props.navigation);
+                      return props.navigation.navigate(StackDoctor.article, {
+                        articleId: art.articleId,
+                        docId: art.docId,
+                        userType: art.userType,
+                      });
+                    }}>
+                    <View>
+                      <Text style={[styles.txt]}>{art.title}</Text>
+                      <Text
+                        style={[
+                          styles.txt,
+                        ]}>{`${art.initailName} ${art.fName} ${art.lName}`}</Text>
+                    </View>
+                  </TouchableHighlight>
                 </View>
-              </TouchableHighlight>
-            </View>
-            <View style={styles.eachArticle}>
-              <TouchableHighlight>
-                <View>
-                  <Text style={[styles.txt]}>i am a heading</Text>
-                  <Text style={[styles.txt]}>Doctor Name</Text>
-                </View>
-              </TouchableHighlight>
-            </View>
-            <View style={styles.eachArticle}>
-              <TouchableHighlight>
-                <View>
-                  <Text style={[styles.txt]}>i am a heading</Text>
-                  <Text style={[styles.txt]}>Doctor Name</Text>
-                </View>
-              </TouchableHighlight>
-            </View>
+              );
+            })}
           </View>
         </ScrollView>
       </MainContainer>
