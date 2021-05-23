@@ -10,23 +10,38 @@ import {updateConsultsState} from './.././../store/actions/auth';
 
 export default function ConsultsSnapshot() {
   let authReducer = useSelector(state => state.authReducer);
-
   const dispatch = useDispatch();
 
   useEffect(() => {
-    let unsubscribe = firestore()
+    let unsubscribe;
+    if(authReducer.userType === "doctors") {
+      unsubscribe = firestore()
       .collection('consults')
-      .where('user.userId', '==', authReducer.userId)
+      .where('doctor.docId', '==', authReducer.userId)
       .onSnapshot(snaps => {
         let docs = snaps.docs;
         let allConsults = [];
-
         docs.map(doc => {
           let data = doc.data();
           allConsults.push(data);
         });
         dispatch(updateConsultsState(allConsults));
       });
+    } else {
+      unsubscribe = firestore()
+      .collection('consults')
+      .where('user.userId', '==', authReducer.userId)
+      .onSnapshot(snaps => {
+        let docs = snaps.docs;
+        let allConsults = [];
+        docs.map(doc => {
+          let data = doc.data();
+          allConsults.push(data);
+        });
+        dispatch(updateConsultsState(allConsults));
+      });
+    }
+    
     return () => unsubscribe();
   }, []);
 

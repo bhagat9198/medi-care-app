@@ -75,7 +75,7 @@ export default function MyDoctors(props) {
 
   const eachConsultUI = con => {
     let booked = new Date(con.booked).toISOString().split('T')[0];
-    let date = new Date(con.data.date).toISOString().split('T')[0];
+    let date = new Date(con.data.date.seconds * 1000).toISOString().split('T')[0];
     let time = new Date(con.data.time.seconds * 1000)
       .toISOString()
       .split('T')[1]

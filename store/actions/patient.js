@@ -6,7 +6,6 @@ export const UPDATE_PRECAUTION_DESCRIBTION_STATE =
 
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
-import {log} from 'react-native-reanimated';
 
 export const extractAllConsults = () => {
   return async dispatch => {
@@ -48,11 +47,13 @@ export const extractAllConsults = () => {
 export const bookConsult = data => {
   return async (dispatch, getState) => {
     let authReducer = getState().authReducer;
+    let randomId = Math.random();
     let userRef = await firestore()
       .collection(authReducer.userType)
       .doc(authReducer.userId);
     let docRef = await firestore().collection('doctors').doc(data.docId);
     let consultRefId;
+    
     return firestore()
       .collection('consults')
       .add({
@@ -65,7 +66,7 @@ export const bookConsult = data => {
           mode: data.mode,
         },
         booked: new Date().valueOf(),
-        id: Math.random(),
+        id: randomId,
         user: {
           userId: authReducer.userId,
           userType: authReducer.userType,
@@ -128,7 +129,8 @@ export const bookReminder = data => {
       let doc = await ref.get();
       let docData = doc.data();
       docData.reminders.push(data);
-      ref.update(docData);
+      await ref.update(docData);
+      scheduleNotification(data.title, data.description, data.time);
       return {
         status: true,
       };
@@ -314,12 +316,10 @@ export const addDisease = diseases => {
 };
 
 export const addConsultReview = (docId, review) => {
-  console.log('addConsultReview', docId, review);
   return async(dispatch, getState) => {
     let ref = await firestore().collection('consults').doc(`${docId}`); 
     return ref.get().then(doc => {
       let docData = doc.data();
-      console.log('docData.data.review', docData);
       docData.data.review = review;
       return ref.update(docData);
     }).then(() => {
@@ -335,3 +335,68 @@ export const addConsultReview = (docId, review) => {
     })
   }
 }
+
+
+// PushNotification.localNotification({
+//   title: 'My Notification Title', // (optional)
+//   message: 'My Notification Message', // (required)
+// });
+
+import PushNotification from 'react-native-push-notification';
+
+PushNotification.configure({
+  onRegister: function (token) {
+    // console.log('TOKEN:', token);
+  },
+
+  onNotification: function (notification) {
+    // console.log('NOTIFICATION:', notification);
+
+    // process the notification
+
+    // (required) Called when a remote is received or opened, or local notification is opened
+    // notification.finish(PushNotificationIOS.FetchResult.NoData);
+  },
+
+  // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
+  onAction: function (notification) {
+    // console.log('ACTION:', notification.action);
+    // console.log('NOTIFICATION:', notification);
+  },
+  // requestPermissions: true,
+});
+
+const scheduleNotification = (title, message, time) => {
+  let currentDate = new Date();
+  let a = currentDate.getTime();
+  // console.log('a', a);
+  let d = currentDate.getTimezoneOffset() * 60 * 1000;
+  // console.log('d', d);
+  let w =  new Date(a - (d));
+  // console.log('w', w);
+  currentDate = w;
+
+  currentDate = new Date(currentDate).toISOString().split('T')[0];
+
+  // console.log('currentDate--', currentDate);
+  let year = parseInt(currentDate.split('-')[0]);
+  let month = parseInt(currentDate.split('-')[1]);
+  let day = parseInt(currentDate.split('-')[2]);
+  // console.log(day, month, year);
+  let noti = new Date();
+
+  noti = noti.setFullYear(year);
+  noti = new Date(noti).setMonth(month - 1);
+  noti = new Date(noti).setDate(day);  
+  noti = new Date(noti).setHours(time.hours + 5);
+  noti = new Date(noti).setMinutes(time.minutes + 30);
+  // console.log('notifyTime!!!!', noti, new Date(noti));
+
+  PushNotification.localNotificationSchedule({
+    title: title,
+    message: message, // (required)
+    date: new Date(noti), // in 60 secs
+    // allowWhileIdle: false, // (optional) set notification to work while on doze, default: false
+  });
+}
+

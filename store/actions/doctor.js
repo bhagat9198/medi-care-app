@@ -347,7 +347,6 @@ export const extractUserAllArticle = () => {
   };
 };
 
-
 export const deleteArticle = (collectionName, docId, articleId) => {
   return async(dispatch) => {
     let ref = await firestore().collection(collectionName).doc(docId);
@@ -364,6 +363,29 @@ export const deleteArticle = (collectionName, docId, articleId) => {
         message: error.message
       }
     })
+  }
+}
+
+export const changeConsultStatus = (collectionName, docId, status) => {
+  return async(dispatch, getState) => {
+    // const authState = getState().authReducer;
+    try {
+      let ref = await firestore().collection(collectionName).doc(docId);
+      let refDoc = await ref.get();
+      let refData = refDoc.data();
+      refData.status = status;
+      await ref.update('status',refData.status)
+      return {
+        status: true
+      }
+
+    } catch(error) {
+      return {
+        status: false,
+        title: 'Something went wrong',
+        message: `Unable to make changes. ${error.message}`
+      }
+    }
   }
 }
 

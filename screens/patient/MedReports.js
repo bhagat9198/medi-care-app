@@ -86,9 +86,7 @@ export default function MedReports(props) {
     };
 
     let res = await dispatch(addMedReport(medReportData));
-    console.log('res med', res);
     if (res.status) {
-      console.log(true);
       // return Alert.alert('Success', 'Your email is succesfully sent');
       props.navigation.navigate(DrawerPatient.dashboardDrawer)
     } else {

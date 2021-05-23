@@ -5,37 +5,53 @@ import {Dimensions, ScrollView} from 'react-native';
 import styled, {ThemeProvider} from 'styled-components';
 import {useSelector, useDispatch} from 'react-redux';
 import ConsultsSnapshot from './../../components/helpers/ConsultsSnapshot';
+import UserSnapshot from './../../components/helpers/UserSnapshot';
 
 export default function Consults() {
   const theme = useSelector(state => state.appReducer.colors);
   const consultsStore = useSelector(state => state.consultsReducer);
+  const userStore = useSelector(state => state.authReducer);
 
-  const eachConsultUI = () => {
+  const eachConsultUI = con => {
+    const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'FRI', 'SAT'];
+    let booked, date, time, hours, minutes, day ;
+    booked = new Date(con.booked).toISOString().split('T')[0];
+    date = new Date(con.data.date.seconds * 1000).toISOString().split('T')[0];
+    time = new Date(con.data.time.seconds * 1000)
+      .toISOString()
+      .split('T')[1]
+      .split('.')[0];
+    hours = time.split(':')[0];
+    minutes = time.split(':')[1];
+    let fullDate = new Date(con.data.date.seconds * 1000);
+    let dayindex = fullDate.getDay();
+    day = daysOfWeek[dayindex];
+
     return (
-      <EachConsult
+      <EachConsult key={Math.random()}
         style={{marginBottom: Dimensions.get('window').height * 0.05}}>
         <DayTimeCont>
           <TimeCont>
-            <TimeContText>12</TimeContText>
+            <TimeContText>{hours}</TimeContText>
           </TimeCont>
           <TimeCont>
-            <TimeContText>30</TimeContText>
+            <TimeContText>{minutes}</TimeContText>
           </TimeCont>
-          <DayCont>
-            <DayContText>SAT</DayContText>
+          <DayCont>   
+            <DayContText>{day}</DayContText>
           </DayCont>
         </DayTimeCont>
         <AllDetailsCont>
           <DetailsCont>
             <DateCont>
-              <DateContText>27th Aprail,21</DateContText>
+              <DateContText>{date}</DateContText>
             </DateCont>
             <DetailCont>
               <Label>
                 <LabelText>Mode</LabelText>
               </Label>
               <Info>
-                <InfoText>Online</InfoText>
+                <InfoText>{con.data.mode}</InfoText>
               </Info>
             </DetailCont>
             <DetailCont>
@@ -48,34 +64,80 @@ export default function Consults() {
             </DetailCont>
             <DetailCont>
               <Label>
+                <LabelText>Pateint Review</LabelText>
+              </Label>
+              <Info>
+                <InfoText>{con.data.review}</InfoText>
+              </Info>
+            </DetailCont>
+            <DetailCont>
+              <Label>
                 <LabelText>Cause</LabelText>
               </Label>
               <Info>
-                <InfoText>Fever</InfoText>
+                <InfoText>{con.data.title}</InfoText>
+              </Info>
+            </DetailCont>
+            <DetailCont>
+              <Label>
+                <LabelText>Fee</LabelText>
+              </Label>
+              <Info>
+                <InfoText>{con.data.fee}</InfoText>
               </Info>
             </DetailCont>
           </DetailsCont>
           <StatusCont>
-            <StatusText>Accepted</StatusText>
+            <StatusText>{con.status}</StatusText>
           </StatusCont>
         </AllDetailsCont>
       </EachConsult>
     );
   };
 
+  const notAvalibaleUI = () => {
+    return (
+      <NotAvalibaleCont>
+        <NotAvalibaleText>
+          No Consults are made till now. You will get soon, just be patience.
+        </NotAvalibaleText>
+      </NotAvalibaleCont>
+    );
+  };
+
+  const allConsultsUI = () => {
+    return consultsStore.allConsults.map(con => {
+      return eachConsultUI(con);
+    });
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <MainContainer>
         <ScrollView contentContainerStyle={{flexGrow: 1, alignItems: 'center'}}>
+          <ConsultsSnapshot />
+          <UserSnapshot />
           <AllConsults style={{flex: 1}}>
-            {/* {consultsStore?.allConsults?.length } */}
-{eachConsultUI()}
+            {consultsStore?.allConsults?.length > 0
+              ? allConsultsUI()
+              : notAvalibaleUI()}
           </AllConsults>
         </ScrollView>
       </MainContainer>
     </ThemeProvider>
   );
 }
+
+const NotAvalibaleCont = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
+
+const NotAvalibaleText = styled.Text`
+  color: orange;
+  font-size: 20px;
+`;
 
 const AllConsults = styled.View``;
 
@@ -133,7 +195,7 @@ const AllDetailsCont = styled.View`
 `;
 
 const DayTimeCont = styled.View`
-  width: 20%;
+  width: 25%;
   border-right-color: green;
   border-width: 8px;
   align-items: center;
@@ -159,10 +221,11 @@ const DayCont = styled.View`
 const TimeCont = styled.View``;
 
 const EachConsult = styled.View`
-  flex: 1;
+  /* flex: 1; */
+  height: 250px;
   background-color: ${props => props.theme.secondary};
   flex-direction: row;
-  width: 90%;
+  width: 95%;
 `;
 
 const MainContainer = styled.View`

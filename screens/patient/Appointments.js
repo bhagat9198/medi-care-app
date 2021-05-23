@@ -21,7 +21,6 @@ export default function Appointments() {
 
   const submmitFeedBackHandler = async docId => {
     let res = await dispatch(addConsultReview(docId, feeback));
-    console.log('res appointment', res);
     if (res.status) {
       return Alert.alert('Success', 'Thank you for provinding feedback.');
     } else {
@@ -32,7 +31,6 @@ export default function Appointments() {
   const eachAppointmentUI = () => {
     return consultsStore.allConsults.map((con, index) => {
       if (!con.data.date) return;
-      console.log(con);
       let booked, date, time;
       booked = new Date(con.booked).toISOString().split('T')[0];
       date = (new Date(con.data.date.seconds * 1000).toISOString()).split('T')[0];

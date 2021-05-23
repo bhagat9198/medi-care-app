@@ -12,7 +12,7 @@ import {
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {StackPatient} from './../../constants/Navigation';
 import {extractPrecationAndDescription} from '../../store/actions/patient';
-import PatientSnapshot from './../../components/helpers/PatientSnapshot';
+import UserSnapshot from './../../components/helpers/UserSnapshot';
 
 export default Diseases = props => {
   const dispatch = useDispatch();
@@ -280,7 +280,7 @@ export default Diseases = props => {
             </AllDiseasesHeading>
             {authStore?.diseases?.length > 0 ? eachDiseaseUI() : notAvalibaleUI()}
           </AllDiseasesCont>
-          <PatientSnapshot />
+          <UserSnapshot />
         </MainContainer>
       </ScrollView>
     </ThemeProvider>

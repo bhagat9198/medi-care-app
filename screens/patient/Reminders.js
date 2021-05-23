@@ -27,6 +27,22 @@ export default function Reminders(props) {
   const allReminders = authStore.reminders;
   const dispatch = useDispatch();
 
+  // let currentDate = Date.now();
+  // currentDate = new Date(currentDate).toISOString().split('T')[0];
+  // console.log('currentDate--', currentDate);
+  // let year = parseInt(currentDate.split('-')[0]);
+  // let month = parseInt(currentDate.split('-')[1]);
+  // let day = parseInt(currentDate.split('-')[2]);
+  // console.log(day, month, year);
+  // let noti = new Date();
+
+  // noti = noti.setFullYear(year);
+  // noti = new Date(noti).setMonth(month - 1);
+  // noti = new Date(noti).setDate(day);
+  // noti = new Date(noti).setHours(12 + 5);
+  // noti = new Date(noti).setMinutes(12 + 30);
+  // console.log('notifyTime', noti, new Date(noti));
+
   const reminderDeleteHandler = async id => {
     let res = await dispatch(deleteReminder(id));
     if (res.status) {
