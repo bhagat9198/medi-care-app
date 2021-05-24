@@ -11,7 +11,7 @@ import {StackPatient} from '../constants/Navigation';
 
 export default function EachConsult(props) {
   // console.log('EachConsult');
-
+  console.log(props);
   return (
     <EachConsultCont
       style={{

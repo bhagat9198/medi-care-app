@@ -366,23 +366,30 @@ PushNotification.configure({
   // requestPermissions: true,
 });
 
+// PushNotification.createChannel(
+//   {
+//     channelId: "dark9198", // (required)
+//     channelName: "My channel", // (required)
+//     channelDescription: "A channel to categorise your notifications", // (optional) default: undefined.
+//     playSound: false, // (optional) default: true
+//     soundName: "default", // (optional) See `soundName` parameter of `localNotification` function
+//     importance: Importance.HIGH, // (optional) default: Importance.HIGH. Int value of the Android notification importance
+//     vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
+//   },
+//   (created) => console.log(`createChannel returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
+// );
+
 const scheduleNotification = (title, message, time) => {
   let currentDate = new Date();
   let a = currentDate.getTime();
-  // console.log('a', a);
   let d = currentDate.getTimezoneOffset() * 60 * 1000;
-  // console.log('d', d);
   let w =  new Date(a - (d));
-  // console.log('w', w);
   currentDate = w;
 
   currentDate = new Date(currentDate).toISOString().split('T')[0];
-
-  // console.log('currentDate--', currentDate);
   let year = parseInt(currentDate.split('-')[0]);
   let month = parseInt(currentDate.split('-')[1]);
   let day = parseInt(currentDate.split('-')[2]);
-  // console.log(day, month, year);
   let noti = new Date();
 
   noti = noti.setFullYear(year);
@@ -390,13 +397,12 @@ const scheduleNotification = (title, message, time) => {
   noti = new Date(noti).setDate(day);  
   noti = new Date(noti).setHours(time.hours + 5);
   noti = new Date(noti).setMinutes(time.minutes + 30);
-  // console.log('notifyTime!!!!', noti, new Date(noti));
 
   PushNotification.localNotificationSchedule({
     title: title,
-    message: message, // (required)
-    date: new Date(noti), // in 60 secs
-    // allowWhileIdle: false, // (optional) set notification to work while on doze, default: false
+    message: message,
+    date: new Date(year, month -1, day, parseInt(time.hours), parseInt(time.minutes)),
+    allowWhileIdle: true,
   });
 }
 
